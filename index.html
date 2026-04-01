@@ -5,102 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Niva Follower Coin Buy</title>
     
-    <script src="https://telegram.org/js/telegram-web-app.js">
-// --- CUSTOM LIMITS FEATURE ---
-window.customLimits = { minAdminRate: 0, minSubmitCoin: 5000 };
-db.ref('settings/limits').on('value', snap => { window.customLimits = snap.val() || { minAdminRate:0, minSubmitCoin:5000 }; });
-
-function updateCustomLimits() {
-    const minAdmin = parseFloat(document.getElementById('adm-min-admin-coin').value) || 0;
-    const minSubmit = parseFloat(document.getElementById('adm-min-submit-coin').value) || 0;
-    db.ref('settings/limits').set({ minAdminRate: minAdmin, minSubmitCoin: minSubmit }).then(() => alert("Custom limits updated!"));
-}
-
-// Enforce limits in calculatePayout
-const originalCalculatePayout = calculatePayout;
-calculatePayout = function() {
-    const qty = parseFloat(document.getElementById('input-qty').value) || 0;
-    const limits = window.customLimits;
-    const appliedRate = qty >= 100000 ? Math.max(currentCoinAdminRate, limits.minAdminRate) : currentCoinRate;
-    const raw = (qty/1000) * appliedRate;
-    calculatedFinalPayout = (raw>5 && qty>=limits.minSubmitCoin) ? Number(raw-5).toFixed(2) : "0.00";
-    document.getElementById('display-final-payout').innerText = calculatedFinalPayout + " ৳";
-};
-
-// Enforce minimum submit coin in showConfirmation
-const originalShowConfirmation = showConfirmation;
-showConfirmation = function() {
-    const qty = parseFloat(document.getElementById('input-qty').value) || 0;
-    const limits = window.customLimits;
-    if(qty<limits.minSubmitCoin) return alert(`Minimum submit coin is ${limits.minSubmitCoin}`);
-    originalShowConfirmation();
-};
-
-</script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js">
-// --- CUSTOM LIMITS FEATURE ---
-window.customLimits = { minAdminRate: 0, minSubmitCoin: 5000 };
-db.ref('settings/limits').on('value', snap => { window.customLimits = snap.val() || { minAdminRate:0, minSubmitCoin:5000 }; });
-
-function updateCustomLimits() {
-    const minAdmin = parseFloat(document.getElementById('adm-min-admin-coin').value) || 0;
-    const minSubmit = parseFloat(document.getElementById('adm-min-submit-coin').value) || 0;
-    db.ref('settings/limits').set({ minAdminRate: minAdmin, minSubmitCoin: minSubmit }).then(() => alert("Custom limits updated!"));
-}
-
-// Enforce limits in calculatePayout
-const originalCalculatePayout = calculatePayout;
-calculatePayout = function() {
-    const qty = parseFloat(document.getElementById('input-qty').value) || 0;
-    const limits = window.customLimits;
-    const appliedRate = qty >= 100000 ? Math.max(currentCoinAdminRate, limits.minAdminRate) : currentCoinRate;
-    const raw = (qty/1000) * appliedRate;
-    calculatedFinalPayout = (raw>5 && qty>=limits.minSubmitCoin) ? Number(raw-5).toFixed(2) : "0.00";
-    document.getElementById('display-final-payout').innerText = calculatedFinalPayout + " ৳";
-};
-
-// Enforce minimum submit coin in showConfirmation
-const originalShowConfirmation = showConfirmation;
-showConfirmation = function() {
-    const qty = parseFloat(document.getElementById('input-qty').value) || 0;
-    const limits = window.customLimits;
-    if(qty<limits.minSubmitCoin) return alert(`Minimum submit coin is ${limits.minSubmitCoin}`);
-    originalShowConfirmation();
-};
-
-</script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js">
-// --- CUSTOM LIMITS FEATURE ---
-window.customLimits = { minAdminRate: 0, minSubmitCoin: 5000 };
-db.ref('settings/limits').on('value', snap => { window.customLimits = snap.val() || { minAdminRate:0, minSubmitCoin:5000 }; });
-
-function updateCustomLimits() {
-    const minAdmin = parseFloat(document.getElementById('adm-min-admin-coin').value) || 0;
-    const minSubmit = parseFloat(document.getElementById('adm-min-submit-coin').value) || 0;
-    db.ref('settings/limits').set({ minAdminRate: minAdmin, minSubmitCoin: minSubmit }).then(() => alert("Custom limits updated!"));
-}
-
-// Enforce limits in calculatePayout
-const originalCalculatePayout = calculatePayout;
-calculatePayout = function() {
-    const qty = parseFloat(document.getElementById('input-qty').value) || 0;
-    const limits = window.customLimits;
-    const appliedRate = qty >= 100000 ? Math.max(currentCoinAdminRate, limits.minAdminRate) : currentCoinRate;
-    const raw = (qty/1000) * appliedRate;
-    calculatedFinalPayout = (raw>5 && qty>=limits.minSubmitCoin) ? Number(raw-5).toFixed(2) : "0.00";
-    document.getElementById('display-final-payout').innerText = calculatedFinalPayout + " ৳";
-};
-
-// Enforce minimum submit coin in showConfirmation
-const originalShowConfirmation = showConfirmation;
-showConfirmation = function() {
-    const qty = parseFloat(document.getElementById('input-qty').value) || 0;
-    const limits = window.customLimits;
-    if(qty<limits.minSubmitCoin) return alert(`Minimum submit coin is ${limits.minSubmitCoin}`);
-    originalShowConfirmation();
-};
-
-</script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -390,6 +298,19 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
     background: #2563eb;
     color: white;
 }
+    
+/* ADMIN TOGGLE + EXTRA STATS */
+.adm-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:15px; }
+@media (max-width: 520px) { .adm-stats-row { grid-template-columns:1fr; } }
+.adm-switch { position: relative; display: inline-block; width: 52px; height: 28px; }
+.adm-switch input { opacity: 0; width: 0; height: 0; }
+.adm-slider { position:absolute; cursor:pointer; inset:0; background:#334155; border-radius:999px; transition:.2s; }
+.adm-slider:before { content:""; position:absolute; height:20px; width:20px; left:4px; top:4px; background:white; border-radius:50%; transition:.2s; }
+.adm-switch input:checked + .adm-slider { background:#2563eb; }
+.adm-switch input:checked + .adm-slider:before { transform:translateX(24px); }
+.admin-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.admin-small-note { font-size:12px; color:#94a3b8; line-height:1.5; }
+
     </style>
 </head>
 <body>
@@ -445,8 +366,8 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
     <div id="admin-dashboard-view" style="display: none;">
         <div class="adm-container">
             <header style="margin: 30px 0 20px;">
-                <h1 style="font-size: 24px; font-weight: 900; color: #1e293b;">Admin Command Center</h1>
-                <p style="color: #64748b; font-size: 14px;">Manage orders, market rates and settings.</p>
+                <h1 style="font-size: 24px; font-weight: 900; color: #f1f5f9;">Admin Command Center</h1>
+                <p style="color: #94a3b8; font-size: 14px;">Manage orders, market rates and settings.</p>
             </header>
 
             <div class="adm-stats-row">
@@ -454,7 +375,15 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
         <small>Pending Orders</small>
         <h3 id="adm-total-pending">0</h3>
     </div>
-            </div>
+    <div class="adm-stat-box">
+        <small>Approved</small>
+        <h3 id="adm-total-approved">0</h3>
+    </div>
+    <div class="adm-stat-box">
+        <small>Rejected</small>
+        <h3 id="adm-total-rejected">0</h3>
+    </div>
+</div>
 
            <div class="adm-tab-menu">
     <div class="adm-tab active" onclick="switchAdminTab('pending', this)">
@@ -562,813 +491,836 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
 </div>
 
 <script>
-    /* =========================================
-       CORE LOGIC
-       ========================================= */
     const firebaseConfig = {
         apiKey: "AIzaSyCr8sETndZNsPP9o86tMuLbI8XkxkBRtEY",
-  authDomain: "coin-sell-bd-19a46.firebaseapp.com",
-  databaseURL: "https://coin-sell-bd-19a46-default-rtdb.firebaseio.com",
-  projectId: "coin-sell-bd-19a46",
-  storageBucket: "coin-sell-bd-19a46.firebasestorage.app",
-  messagingSenderId: "1058903991794",
-  appId: "1:1058903991794:web:036ec5718256732775b76b",
-  measurementId: "G-80BFD3XY9L"
-
+        authDomain: "coin-sell-bd-19a46.firebaseapp.com",
+        databaseURL: "https://coin-sell-bd-19a46-default-rtdb.firebaseio.com",
+        projectId: "coin-sell-bd-19a46",
+        storageBucket: "coin-sell-bd-19a46.firebasestorage.app",
+        messagingSenderId: "1058903991794",
+        appId: "1:1058903991794:web:036ec5718256732775b76b",
+        measurementId: "G-80BFD3XY9L"
     };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    const storage = firebase.storage();
     const tg = window.Telegram.WebApp;
     const ADMIN_LIST = [7940769450, 8505710811, 7665757155];
 
-    let currentSelectedCoin = "", currentCoinRate = 0, currentCoinAdminRate = 0, currentCoinTID = "", calculatedFinalPayout = 0;
+    let currentSelectedCoin = "";
+    let currentCoinRate = 0;
+    let currentCoinAdminRate = 0;
+    let currentCoinTID = "";
+    let currentCoinSubmitLimit = 5000;
+    let currentCoinAdminMinQty = 100000;
+    let calculatedFinalPayout = 0;
+    let currentAppliedRate = 0;
     let adminActiveTab = 'pending';
+    let tutorialUploadInProgress = false;
+    let currentTutorialData = null;
+
+    function safeHaptic(type, level) {
+        try {
+            if (!tg || !tg.HapticFeedback) return;
+            if (type === 'impact') tg.HapticFeedback.impactOccurred(level || 'medium');
+            if (type === 'notify') tg.HapticFeedback.notificationOccurred(level || 'success');
+        } catch (_) {}
+    }
+
+    function notify(msg) {
+        alert(msg);
+    }
+
+    function normalizeSubmitLimit(value) {
+        const n = parseInt(value, 10);
+        return Number.isFinite(n) && n > 0 ? n : 5000;
+    }
+
+    function normalizeAdminMinQty(value) {
+        const n = parseInt(value, 10);
+        return Number.isFinite(n) && n > 0 ? n : 100000;
+    }
+
+    function formatMoney(value) {
+        const n = parseFloat(value || 0);
+        return Number.isFinite(n) ? n.toFixed(2) + '৳' : '0.00৳';
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function getOrderOwnerLabel(order) {
+        return order.username || order.user || order.ownerUid || 'guest';
+    }
 
     window.onload = () => {
-    tg.expand();
+        tg.expand();
 
-    // টেলিগ্রাম থেকে ইউজার ডাটা নেওয়া
-    const user = tg.initDataUnsafe.user || { id: 0, first_name: "Guest", username: "guest" };
-    const userId = Number(user.id);
-    
-    // গ্লোবাল ভেরিয়েবলে ইউজারনেম সেভ রাখা (লিডারবোর্ডের জন্য)
-    window.currentTelegramUser = user.username || user.first_name || "Guest";
+        const user = tg.initDataUnsafe.user || { id: 0, first_name: "Guest", username: "guest" };
+        const userId = Number(user.id || 0);
+        window.currentTelegramUser = user.username || user.first_name || 'Guest';
 
-    const userNameEl = document.getElementById('user-display-name');
-    const userTagEl = document.getElementById('user-display-tag');
-    const userPfpEl = document.getElementById('user-pfp');
+        const userNameEl = document.getElementById('user-display-name');
+        const userTagEl = document.getElementById('user-display-tag');
+        const userPfpEl = document.getElementById('user-pfp');
 
-    if(userNameEl) userNameEl.innerText = user.first_name + (user.last_name ? " " + user.last_name : "");
-    if(userTagEl) userTagEl.innerText = "@" + (user.username || "guest");
-    
-    if(userPfpEl) {
-        userPfpEl.src = user.photo_url || `https://ui-avatars.com/api/?name=${user.first_name}&background=3b82f6&color=fff&bold=true`;
-    }
-
-    // --- অ্যাডমিন বাটন সিকিউরিটি ---
-    const adminBtn = document.getElementById('admin-shortcut');
-    if (adminBtn) {
-        if (ADMIN_LIST.includes(userId)) {
-            // শুধুমাত্র অ্যাডমিন হলে বাটনটি দৃশ্যমান হবে
-            adminBtn.style.display = 'flex'; 
-        } else {
-            // অ্যাডমিন না হলে বাটনটি ডকুমেন্ট থেকে পুরোপুরি মুছে যাবে
-            adminBtn.remove(); 
+        if (userNameEl) userNameEl.innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+        if (userTagEl) userTagEl.innerText = '@' + (user.username || 'guest');
+        if (userPfpEl) {
+            userPfpEl.src = user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name || 'Guest')}&background=3b82f6&color=fff&bold=true`;
         }
-    }
 
-    // লোডিং স্ক্রিন প্রসেস
-    setTimeout(() => {
-        const loadingScr = document.getElementById('loading');
-        if(loadingScr) {
-            loadingScr.style.opacity = '0';
-            setTimeout(() => {
-                loadingScr.style.display = 'none';
-                document.getElementById('user-app-interface').style.display = 'block';
-            }, 500);
+        const adminBtn = document.getElementById('admin-shortcut');
+        if (adminBtn) {
+            if (ADMIN_LIST.includes(userId)) adminBtn.style.display = 'flex';
+            else adminBtn.remove();
         }
-    }, 2000);
 
-    // ডাটা লোড করা শুরু
-    initializeDataFetching();
-    fetchHistory();
-    fetchLeaderboard();
-};
+        setTimeout(() => {
+            const loadingScr = document.getElementById('loading');
+            if (loadingScr) {
+                loadingScr.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScr.style.display = 'none';
+                    const app = document.getElementById('user-app-interface');
+                    if (app) app.style.display = 'block';
+                }, 500);
+            }
+        }, 2000);
+
+        initializeDataFetching();
+        fetchHistory();
+        fetchLeaderboard();
+        startAdminEngine();
+    };
 
     function initializeDataFetching() {
         db.ref('marketConfig').on('value', snap => {
-            let html = "";
+            let html = '';
             snap.forEach(c => {
-                const v = c.val(); const on = v.status !== false;
-                const safeKey = String(c.key || '').replace(/"/g, '&quot;');
-                const safeTid = String(v.transferId || '').replace(/"/g, '&quot;');
-                html += `<div class="coin-card ${!on ? 'offline' : ''}"
-                    ${on ? `data-coin="${safeKey}" data-user-rate="${Number(v.userRate || 0)}" data-admin-rate="${Number(v.adminRate || 0)}" data-transfer-id="${safeTid}" onclick="handleCoinCardClick(this)"` : ''}>
+                const v = c.val() || {};
+                const on = v.status !== false;
+                const submitLimit = normalizeSubmitLimit(v.submitLimit);
+                const adminMinQty = normalizeAdminMinQty(v.adminMinQty);
+                html += `<div class="coin-card ${on ? '' : 'offline'}"
+                    ${on ? `data-coin="${escapeHtml(c.key)}" data-user-rate="${Number(v.userRate || 0)}" data-admin-rate="${Number(v.adminRate || 0)}" data-transfer-id="${escapeHtml(v.transferId || '')}" data-submit-limit="${submitLimit}" data-admin-min="${adminMinQty}" onclick="handleCoinCardClick(this)"` : ''}>
                     <div class="status-badge ${on ? 'status-online' : 'status-offline'}">${on ? '● Online' : '● Offline'}</div>
                     <div style="display:flex; align-items:center; gap:15px;">
                         <div class="icon-box">🪙</div>
-                        <div><b style="font-size:18px;">${c.key}</b><br><small style="color:#ADADAD; font-weight:800;">MARKET RATE</small></div>
+                        <div><b style="font-size:18px;">${escapeHtml(c.key)}</b><br><small style="color:#ADADAD; font-weight:800;">MARKET RATE</small></div>
                     </div>
                     <div class="rate-grid">
-                        <div class="rate-box"><small>User Rate</small><div class="rate-val">${v.userRate}৳</div></div>
-                        <div class="rate-box"><small>Admin Rate</small><div class="rate-val">${v.adminRate}৳</div></div>
+                        <div class="rate-box"><small>User Rate</small><div class="rate-val">${Number(v.userRate || 0)}৳</div></div>
+                        <div class="rate-box"><small>Admin Rate</small><div class="rate-val">${Number(v.adminRate || 0)}৳</div></div>
                     </div>
                 </div>`;
             });
-            document.getElementById('market-list-display').innerHTML = html;
+            const market = document.getElementById('market-list-display');
+            if (market) market.innerHTML = html;
         });
 
         db.ref('settings/links').on('value', s => {
-            if(s.val()){
-                document.getElementById('chan-link').href = s.val().channel || "#";
-                document.getElementById('help-link').href = s.val().help || "#";
-            }
+            const data = s.val() || {};
+            const channel = document.getElementById('chan-link');
+            const help = document.getElementById('help-link');
+            if (channel) channel.href = data.channel || '#';
+            if (help) help.href = data.help || '#';
         });
 
         db.ref('paymentMethods').on('value', s => {
-            let o = ""; s.forEach(p => { if(p.val().status) o += `<option value="${p.key}">${p.key}</option>`; });
-            document.getElementById('input-method').innerHTML = o || "<option>No Method</option>";
+            let options = '';
+            s.forEach(p => {
+                const data = p.val() || {};
+                if (data.status !== false) options += `<option value="${escapeHtml(p.key)}">${escapeHtml(p.key)}</option>`;
+            });
+            const method = document.getElementById('input-method');
+            if (method) method.innerHTML = options || '<option>No Method</option>';
         });
     }
 
-    /* --- USER HELPERS --- */
-    // Admin Tab Switching Logic
-function switchAdminTab(t, el) {
-    // ১. Active Tab Variable Update
-    adminActiveTab = t;
-
-    // ২. UI-te Active Class Change
-    document.querySelectorAll('.tab, .adm-tab').forEach(x => x.classList.remove('active'));
-    el.classList.add('active');
-
-    // ৩. Dynamic Content Render
-    const listSection = document.getElementById('order-list-section');
-    const settingsSection = document.getElementById('settings-section');
-
-    if(t === 'settings') {
-        if(listSection) listSection.style.display = 'none';
-        if(settingsSection) settingsSection.style.display = 'block';
-        renderAdminData(); // Settings-er bhitore thaka data render korbe
-    } else {
-        if(settingsSection) settingsSection.style.display = 'none';
-        if(listSection) listSection.style.display = 'block';
-        renderAdminData(); // Pending/History data render korbe
-    }
-}
-
     function handleCoinCardClick(card) {
         if (!card || card.classList.contains('offline')) return;
-        const name = card.dataset.coin || '';
-        const userRate = parseFloat(card.dataset.userRate || 0);
-        const adminRate = parseFloat(card.dataset.adminRate || 0);
-        const tid = card.dataset.transferId || '';
-        openOrderModal(name, userRate, adminRate, tid);
+        openOrderModal(
+            card.dataset.coin || '',
+            parseFloat(card.dataset.userRate || 0),
+            parseFloat(card.dataset.adminRate || 0),
+            card.dataset.transferId || '',
+            normalizeSubmitLimit(card.dataset.submitLimit),
+            normalizeAdminMinQty(card.dataset.adminMin)
+        );
     }
 
-    function openOrderModal(name, userRate, adminRate, tid) {
+    function openOrderModal(name, userRate, adminRate, tid, submitLimit, adminMinQty) {
         currentSelectedCoin = name;
         currentCoinRate = parseFloat(userRate || 0);
         currentCoinAdminRate = parseFloat(adminRate || 0);
         currentCoinTID = tid;
+        currentCoinSubmitLimit = normalizeSubmitLimit(submitLimit);
+        currentCoinAdminMinQty = normalizeAdminMinQty(adminMinQty);
+        currentAppliedRate = currentCoinRate;
+        calculatedFinalPayout = 0;
 
-        document.getElementById('modal-coin-title').innerText = "Sell " + name;
-        document.getElementById('display-admin-id').innerText = tid;
+        document.getElementById('modal-coin-title').innerText = 'Sell ' + name;
+        document.getElementById('display-admin-id').innerText = tid || '---';
         document.getElementById('input-qty').value = '';
         document.getElementById('input-sender').value = '';
         document.getElementById('input-number').value = '';
-        calculatedFinalPayout = 0;
-        document.getElementById('display-final-payout').innerText = "0.00 ৳";
+        document.getElementById('input-qty').placeholder = `Amount (Min ${currentCoinSubmitLimit})`;
+        document.getElementById('display-final-payout').innerText = '0.00 ৳';
 
-        document.getElementById('order-modal').style.display = 'flex';
-        setTimeout(() => document.getElementById('order-modal').classList.add('active'), 10);
+        const orderModal = document.getElementById('order-modal');
+        orderModal.style.display = 'flex';
+        setTimeout(() => orderModal.classList.add('active'), 10);
     }
 
     function closeModal() {
-        document.getElementById('order-modal').classList.remove('active');
-        setTimeout(() => document.getElementById('order-modal').style.display = 'none', 400);
+        const modal = document.getElementById('order-modal');
+        modal.classList.remove('active');
+        setTimeout(() => modal.style.display = 'none', 400);
     }
 
     function calculatePayout() {
         const qty = parseFloat(document.getElementById('input-qty').value) || 0;
-        const appliedRate = qty >= 100000 ? currentCoinAdminRate : currentCoinRate;
-        const raw = (qty / 1000) * appliedRate;
-        calculatedFinalPayout = raw > 5 ? Number(raw - 5).toFixed(2) : "0.00";
-        document.getElementById('display-final-payout').innerText = calculatedFinalPayout + " ৳";
+        currentAppliedRate = qty >= currentCoinAdminMinQty ? currentCoinAdminRate : currentCoinRate;
+        const raw = (qty / 1000) * currentAppliedRate;
+        calculatedFinalPayout = raw > 5 ? Number(raw - 5).toFixed(2) : '0.00';
+        document.getElementById('display-final-payout').innerText = calculatedFinalPayout + ' ৳';
     }
 
     function copyAdminID() {
-        navigator.clipboard.writeText(currentCoinTID);
-        alert("Admin ID Copied!");
+        navigator.clipboard.writeText(String(currentCoinTID || ''));
+        safeHaptic('notify', 'success');
+        notify('Admin ID copied!');
     }
 
-    // Function 1: Double Confirm Modal Open Kora
-function showConfirmation() {
-    const qty = parseFloat(document.getElementById('input-qty').value) || 0;
-    const sender = document.getElementById('input-sender').value.trim();
-    const num = document.getElementById('input-number').value.trim();
-    const method = document.getElementById('input-method').value;
+    function showConfirmation() {
+        const qty = parseFloat(document.getElementById('input-qty').value) || 0;
+        const sender = document.getElementById('input-sender').value.trim();
+        const num = document.getElementById('input-number').value.trim();
+        const method = document.getElementById('input-method').value;
 
-    calculatePayout();
+        calculatePayout();
 
-    if (qty < 5000 || !sender || !num) return alert("Fill all details! (Min 5000)");
-
-    document.getElementById('r-coin').innerText = currentSelectedCoin;
-    document.getElementById('r-qty').innerText = qty;
-    document.getElementById('r-sender').innerText = sender;
-    document.getElementById('r-method').innerText = method;
-    document.getElementById('r-number').innerText = num;
-    document.getElementById('r-pay').innerText = calculatedFinalPayout + " ৳";
-
-    closeModal();
-    const rm = document.getElementById('review-modal');
-    rm.style.display = 'flex';
-    setTimeout(() => rm.classList.add('active'), 10);
-}
-
-// Function 2: Final Submit (Firebase-e data pathano)
-function finalSubmitOrder() {
-    const orderId = Date.now();
-    const user = tg.initDataUnsafe.user || { id: 12345, username: "guest" };
-
-    db.ref('orders/' + orderId).set({
-        id: orderId, 
-        user: user.username || user.first_name || "guest",
-        coin: currentSelectedCoin, 
-        amt: document.getElementById('r-qty').innerText, 
-        payable: parseFloat(calculatedFinalPayout),
-        sender: document.getElementById('r-sender').innerText, 
-        number: document.getElementById('r-number').innerText, 
-        method: document.getElementById('r-method').innerText, 
-        status: 'pending',
-        targetId: currentCoinTID, 
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    }).then(() => {
-        alert("Order Submitted Successfully!");
-        location.reload();
-    });
-}
-
-// Review modal bondho korar extra function
-function closeReviewModal() {
-    document.getElementById('review-modal').classList.remove('active');
-    setTimeout(() => document.getElementById('review-modal').style.display = 'none', 400);
-}
-
-    function finalSubmitOrder() {
-    // Button Disable (Double click protection)
-    const btn = event.target;
-    btn.disabled = true;
-    btn.innerText = "Submitting...";
-
-    const orderId = Date.now();
-    const user = tg.initDataUnsafe.user || { id: 12345, username: "guest" };
-
-    db.ref('orders/' + orderId).set({
-        id: orderId, 
-        user: user.username || user.first_name || "guest",
-        coin: currentSelectedCoin, 
-        amt: document.getElementById('r-qty').innerText, 
-        payable: parseFloat(calculatedFinalPayout),
-        sender: document.getElementById('r-sender').innerText, 
-        number: document.getElementById('r-number').innerText, 
-        method: document.getElementById('r-method').innerText, 
-        status: 'pending',
-        targetId: currentCoinTID, 
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    }).then(() => {
-        // Form Auto Close Logic
-        closeReviewModal(); 
-        alert("Order Submitted Successfully! Check history for updates.");
-        location.reload(); // Page refresh hoye home-e chole jabe
-    }).catch(err => {
-        alert("Error: " + err.message);
-        btn.disabled = false;
-        btn.innerText = "Confirm & Submit ✅";
-    });
-}
-
-function closeReviewModal() {
-    const rm = document.getElementById('review-modal');
-    rm.classList.remove('active');
-    setTimeout(() => { rm.style.display = 'none'; }, 400);
-}
-
-    
-function closeReviewModal() {
-    const rm = document.getElementById('review-modal');
-    rm.classList.remove('active');
-    setTimeout(() => { rm.style.display = 'none'; }, 400);
-}
-
-function finalSubmitOrder(btn) {
-    if (!currentSelectedCoin) return alert("Please select a coin first.");
-
-    if (btn && btn.disabled !== undefined) {
-        btn.disabled = true;
-        btn.innerText = "Submitting...";
-    }
-
-    const orderId = Date.now();
-    const user = tg.initDataUnsafe.user || { id: 12345, username: "guest" };
-
-    db.ref('orders/' + orderId).set({
-        id: orderId,
-        user: user.username || user.first_name || "guest",
-        coin: currentSelectedCoin,
-        amt: parseFloat(document.getElementById('r-qty').innerText) || 0,
-        payable: parseFloat(calculatedFinalPayout) || 0,
-        sender: document.getElementById('r-sender').innerText,
-        number: document.getElementById('r-number').innerText,
-        method: document.getElementById('r-method').innerText,
-        status: 'pending',
-        targetId: currentCoinTID,
-        appliedRate: (parseFloat(document.getElementById('r-qty').innerText) || 0) >= 100000 ? currentCoinAdminRate : currentCoinRate,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    }).then(() => {
-        closeReviewModal();
-        alert("Order Submitted Successfully! Check history for updates.");
-        location.reload();
-    }).catch(err => {
-        alert("Error: " + err.message);
-        if (btn && btn.disabled !== undefined) {
-            btn.disabled = false;
-            btn.innerText = "Confirm & Submit ✅";
+        if (qty < currentCoinSubmitLimit || !sender || !num) {
+            return notify(`Fill all details! (Min ${currentCoinSubmitLimit})`);
         }
-    });
-}
 
+        document.getElementById('r-coin').innerText = currentSelectedCoin;
+        document.getElementById('r-qty').innerText = qty;
+        document.getElementById('r-sender').innerText = sender;
+        document.getElementById('r-method').innerText = method;
+        document.getElementById('r-number').innerText = num;
+        document.getElementById('r-pay').innerText = calculatedFinalPayout + ' ৳';
+
+        closeModal();
+        const rm = document.getElementById('review-modal');
+        rm.style.display = 'flex';
+        setTimeout(() => rm.classList.add('active'), 10);
+    }
+
+    function closeReviewModal() {
+        const rm = document.getElementById('review-modal');
+        rm.classList.remove('active');
+        setTimeout(() => { rm.style.display = 'none'; }, 400);
+    }
+
+    function finalSubmitOrder(btn) {
+        if (!currentSelectedCoin) return notify('Please select a coin first.');
+
+        if (btn && btn.disabled !== undefined) {
+            btn.disabled = true;
+            btn.innerText = 'Submitting...';
+        }
+
+        const orderId = Date.now();
+        const user = tg.initDataUnsafe.user || { id: 0, username: 'guest', first_name: 'Guest' };
+        const username = user.username || user.first_name || 'guest';
+
+        db.ref('orders/' + orderId).set({
+            id: orderId,
+            user: username,
+            username: user.username || username,
+            nickname: [user.first_name, user.last_name].filter(Boolean).join(' ') || username,
+            ownerUid: String(user.id || ''),
+            photo: user.photo_url || '',
+            coin: currentSelectedCoin,
+            amt: parseFloat(document.getElementById('r-qty').innerText) || 0,
+            payable: parseFloat(calculatedFinalPayout) || 0,
+            sender: document.getElementById('r-sender').innerText,
+            number: document.getElementById('r-number').innerText,
+            method: document.getElementById('r-method').innerText,
+            status: 'pending',
+            targetId: currentCoinTID,
+            appliedRate: currentAppliedRate,
+            submitLimit: currentCoinSubmitLimit,
+            adminMinQty: currentCoinAdminMinQty,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            closeReviewModal();
+            notify('Order submitted successfully! Check history for updates.');
+            location.reload();
+        }).catch(err => {
+            notify('Error: ' + err.message);
+            if (btn && btn.disabled !== undefined) {
+                btn.disabled = false;
+                btn.innerText = 'Confirm & Submit ✅';
+            }
+        });
+    }
 
     function fetchHistory() {
-    // Telegram user data check
-    const user = tg.initDataUnsafe.user || { username: "guest" };
-    const uname = user.username || user.first_name || "guest";
-    
-    // User-er username onujayi orders filter kora
-    db.ref('orders').orderByChild('user').equalTo(uname).on('value', s => {
-        let h = ""; 
-        let count = 0;
-        
-        s.forEach(o => {
-            const d = o.val(); 
-            if(d.status === 'completed') count++;
-            
-            // Status onujayi color set kora
-            const color = d.status === 'pending' ? '#f39c12' : (d.status === 'completed' ? '#2ecc71' : '#e74c3c');
-            
-            h += `<div class="action-card" style="flex-direction:column; align-items:flex-start; gap:8px; margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between; width:100%;">
-                        <b>${d.amt} ${d.coin}</b> 
-                        <span style="color:${color}; font-weight:900;">${d.status.toUpperCase()}</span>
-                    </div>
-                    <small style="color:#64748b;">Payable: ${d.payable}৳ | To: ${d.targetId}</small>
-                </div>`;
-        });
-        
-        // UI-te history list ebong success count set kora
-        const historyContainer = document.getElementById('history-list-display');
-        if(historyContainer) historyContainer.innerHTML = h || "<center style='padding:20px; color:#94a3b8;'>No History Found</center>";
-        
-        const countDisplay = document.getElementById('suc-count-display');
-        if(countDisplay) countDisplay.innerText = count;
-    });
-}
+        const user = tg.initDataUnsafe.user || { username: 'guest', first_name: 'Guest' };
+        const uname = user.username || user.first_name || 'guest';
 
-    /* --- LEADERBOARD & SALES LOGIC --- */
+        db.ref('orders').orderByChild('user').equalTo(uname).on('value', s => {
+            let h = '';
+            let count = 0;
 
-// ১. লিডারবোর্ড ডাটা ফেচ এবং ডিলিট লজিক (fetchAdminSettingsData এর ভেতরে থাকবে)
-function fetchLeaderboard() {
-    const rankDisplay = document.getElementById('rank-list-display');
-    if (!rankDisplay) return;
-
-    db.ref('leaderboard').on('value', snap => {
-        let users = [];
-        snap.forEach(u => {
-            let data = u.val();
-            if(data.user) users.push(data);
-        });
-
-        // ১. Sorting: Beshi amount upore
-        users.sort((a, b) => (parseFloat(b.totalAmount) || 0) - (parseFloat(a.totalAmount) || 0));
-
-        // ২. Top 10 Filter: Shudhu prothom 10 jonke nibe
-        const top10 = users.slice(0, 10);
-
-        let html = "<h3 style='margin: 15px 5px;'>🏆 Top 10 Sellers</h3>";
-        
-        if (top10.length === 0) {
-            html += "<p style='text-align:center; padding:20px; color:#ff0303;'>No earners yet.</p>";
-        } else {
-            top10.forEach((d, i) => {
-                let medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`;
-                html += `
-                <div class="action-card" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <div style="font-weight:900; color:#0223f7; width:25px; font-size:14px;">${medal}</div>
-                        <b style="font-size:14px; color:#0061ff;">@${d.user}</b>
-                    </div>
-                    <b style="color:#10b981; font-size:15px;">${parseFloat(d.totalAmount).toFixed(2)}৳</b>
-                </div>`;
+            s.forEach(o => {
+                const d = o.val() || {};
+                if (d.status === 'completed') count++;
+                const color = d.status === 'pending' ? '#f39c12' : (d.status === 'completed' ? '#2ecc71' : '#e74c3c');
+                h += `<div class="action-card" style="flex-direction:column; align-items:flex-start; gap:8px; margin-bottom:10px;">
+                        <div style="display:flex; justify-content:space-between; width:100%;">
+                            <b>${escapeHtml(d.amt)} ${escapeHtml(d.coin)}</b>
+                            <span style="color:${color}; font-weight:900;">${escapeHtml(String(d.status || '').toUpperCase())}</span>
+                        </div>
+                        <small style="color:#64748b;">Payable: ${formatMoney(d.payable)} | To: ${escapeHtml(d.targetId || '---')}</small>
+                    </div>`;
             });
+
+            const historyContainer = document.getElementById('history-list-display');
+            if (historyContainer) historyContainer.innerHTML = h || "<center style='padding:20px; color:#94a3b8;'>No History Found</center>";
+            const countDisplay = document.getElementById('suc-count-display');
+            if (countDisplay) countDisplay.innerText = count;
+        });
+    }
+
+    function fetchLeaderboard() {
+        const rankDisplay = document.getElementById('rank-list-display');
+        if (!rankDisplay) return;
+
+        db.ref('leaderboard').on('value', snap => {
+            const users = [];
+            snap.forEach(u => {
+                const data = u.val() || {};
+                if (data.user) users.push(data);
+            });
+
+            users.sort((a, b) => (parseFloat(b.totalAmount) || 0) - (parseFloat(a.totalAmount) || 0));
+            const top10 = users.slice(0, 10);
+            let html = "<h3 style='margin: 15px 5px;'>🏆 Top 10 Sellers</h3>";
+
+            if (top10.length === 0) {
+                html += "<p style='text-align:center; padding:20px; color:#ff0303;'>No earners yet.</p>";
+            } else {
+                top10.forEach((d, i) => {
+                    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`;
+                    html += `<div class="action-card" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="font-weight:900; color:#0223f7; width:25px; font-size:14px;">${medal}</div>
+                            <b style="font-size:14px; color:#0061ff;">@${escapeHtml(d.user)}</b>
+                        </div>
+                        <b style="color:#10b981; font-size:15px;">${formatMoney(d.totalAmount)}</b>
+                    </div>`;
+                });
+            }
+
+            rankDisplay.innerHTML = html;
+        });
+    }
+
+    function switchTab(id, el) {
+        const screens = ['home-scr', 'history-scr', 'rank-scr'];
+        screens.forEach(s => {
+            const screenEl = document.getElementById(s);
+            if (screenEl) screenEl.style.display = 'none';
+        });
+
+        const target = document.getElementById(id);
+        if (target) target.style.display = 'block';
+
+        document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
+        if (el) el.classList.add('active');
+
+        if (id === 'history-scr') fetchHistory();
+        if (id === 'rank-scr') fetchLeaderboard();
+    }
+
+    function openAdminPanel() {
+        const user = tg.initDataUnsafe.user || {};
+        const userId = Number(user.id || 0);
+        if (!ADMIN_LIST.includes(userId)) {
+            safeHaptic('notify', 'error');
+            return notify('Access Denied! You are not an authorized administrator.');
         }
-        
-        rankDisplay.innerHTML = html;
-    });
-}
 
-// ২. লিডারবোর্ড ইউজার ডিলিট ফাংশন
-function deleteLdrUser(username) {
-    if(confirm(`Remove @${username} from leaderboard?`)) {
-        db.ref('leaderboard/' + username).remove()
-        .then(() => {
-            alert("✅ User removed!");
-        })
-        .catch(err => {
-            alert("❌ Error: " + err.message);
-        });
-    }
-}
+        const adminUI = document.getElementById('admin-master-ui');
+        const lockScreen = document.getElementById('admin-lock-screen');
+        const dashboardView = document.getElementById('admin-dashboard-view');
 
-    /* =========================================
-       ADMIN PANEL LOGIC (ALL FEATURES ADDED)
-       ========================================= */
-    // --- SECTION CONTROL LOGIC ---
-
-function switchTab(id, el) {
-    // ১. Age shob gulo screen (Home, History, Rank) hide korbe
-    const screens = ['home-scr', 'history-scr', 'rank-scr'];
-    screens.forEach(s => {
-        const screenEl = document.getElementById(s);
-        if(screenEl) screenEl.style.display = 'none';
-    });
-
-    // ২. Click kora screen-ti show korbe
-    const target = document.getElementById(id);
-    if(target) target.style.display = 'block';
-
-    // ৩. Nav bar-er button-e active color dibe
-    document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
-    if(el) el.classList.add('active');
-
-    // ৪. History ba Rank-e click korle data auto refresh korbe
-    if(id === 'history-scr') fetchHistory();
-    if(id === 'rank-scr') fetchLeaderboard();
-}
-
-/* --- ADMIN PANEL INTERFACE CONTROL --- */
-
-// Admin Panel Open Korar Function
-function openAdminPanel() {
-    const user = tg.initDataUnsafe.user || {};
-    const userId = Number(user.id);
-
-    // ১. চেক করা হচ্ছে ইউজার আইডি এডমিন লিস্টে আছে কিনা
-    if (!ADMIN_LIST.includes(userId)) {
-        alert("Access Denied! You are not an authorized administrator.");
-        tg.HapticFeedback.notificationOccurred('error'); // ফোনে ভাইব্রেশন দিবে
-        return; // ফাংশন এখানেই থেমে যাবে, ড্যাশবোর্ড খুলবে না
-    }
-
-    // ২. আইডি ঠিক থাকলে ড্যাশবোর্ড ওপেন হবে
-    const adminUI = document.getElementById('admin-master-ui');
-    const lockScreen = document.getElementById('admin-lock-screen');
-    const dashboardView = document.getElementById('admin-dashboard-view');
-
-    if (adminUI) {
-        adminUI.style.display = 'block';
-        if(lockScreen) lockScreen.style.display = 'none'; // পিন স্ক্রিন স্কিপ
-        if(dashboardView) dashboardView.style.display = 'block';
-        
-        adminActiveTab = 'pending';
-        renderAdminData(); 
-        tg.HapticFeedback.impactOccurred('medium');
-    }
-}
-
-// Admin UI Close Korar Function
-function closeAdminPanel() {
-    document.getElementById('admin-master-ui').style.display = 'none';
-}
-
-   function startAdminEngine() {
-    // Orders Listener
-    db.ref('orders').on('value', snap => {
-        const orders = snap.val() || {};
-        let pCount = 0;
-        
-        // সব অর্ডার থেকে pending খুঁজে বের করা
-        Object.values(orders).forEach(o => {
-            if(o.status === 'pending') pCount++;
-        });
-
-        // সরাসরি সংখ্যা বসানো
-        const el = document.getElementById('adm-display-pending');
-        if(el) el.innerText = pCount;
-        
-        // লিস্ট আপডেট
-        if(typeof adminActiveTab !== 'undefined' && adminActiveTab !== 'settings') {
+        if (adminUI) {
+            adminUI.style.display = 'block';
+            if (lockScreen) lockScreen.style.display = 'none';
+            if (dashboardView) dashboardView.style.display = 'block';
+            adminActiveTab = 'pending';
+            document.querySelectorAll('.adm-tab').forEach((tab, index) => tab.classList.toggle('active', index === 0));
             renderAdminData();
+            safeHaptic('impact', 'medium');
         }
-    });
+    }
 
-    // Users Listener
-    db.ref('users').on('value', snap => {
-        const uCount = snap.numChildren() || 0;
-        const uEl = document.getElementById('adm-display-users');
-        if(uEl) uEl.innerText = uCount;
-    });
-}
+    function closeAdminPanel() {
+        const panel = document.getElementById('admin-master-ui');
+        if (panel) panel.style.display = 'none';
+    }
+
+    function verifyAdminPin() {
+        openAdminPanel();
+    }
+
+    function startAdminEngine() {
+        db.ref('orders').on('value', snap => {
+            const orders = snap.val() || {};
+            const counts = { pending: 0, completed: 0, rejected: 0 };
+            Object.values(orders).forEach(o => {
+                if (counts[o.status] !== undefined) counts[o.status]++;
+            });
+            const p = document.getElementById('adm-total-pending');
+            const a = document.getElementById('adm-total-approved');
+            const r = document.getElementById('adm-total-rejected');
+            const pt = document.getElementById('count-pending-tab');
+            if (p) p.innerText = counts.pending;
+            if (a) a.innerText = counts.completed;
+            if (r) r.innerText = counts.rejected;
+            if (pt) pt.innerText = counts.pending;
+            if (document.getElementById('admin-master-ui').style.display === 'block' && adminActiveTab !== 'settings') {
+                renderAdminData();
+            }
+        });
+    }
 
     function switchAdminTab(t, el) {
         adminActiveTab = t;
         document.querySelectorAll('.adm-tab').forEach(x => x.classList.remove('active'));
-        el.classList.add('active');
+        if (el) el.classList.add('active');
         renderAdminData();
     }
 
-    // Instant Data Sync-er jonno connection
-let ordersListener = null;
+    function copyToClipboard(val) {
+        navigator.clipboard.writeText(String(val || ''));
+        safeHaptic('notify', 'success');
+        notify('Copied: ' + val);
+    }
 
-// Real-time Pending Counter (Shob somoy active thakbe)
-db.ref('orders').on('value', s => {
-    const orders = s.val() || {};
-    const count = Object.values(orders).filter(o => o.status === 'pending').length;
-    document.getElementById('adm-total-pending').innerText = count;
-});
+    function renderAdminData() {
+        const area = document.getElementById('admin-dynamic-content');
+        if (!area) return;
 
-/* =========================================
-   COMBINED ADMIN ENGINE (UI + ALL FEATURES)
-   ========================================= */
+        if (adminActiveTab === 'settings') {
+            renderSettingsUI(area);
+            return;
+        }
 
-/* =========================================
-   FIXED ADMIN ENGINE & ACTIONS
-   ========================================= */
+        const isHistory = adminActiveTab === 'history';
+        db.ref('orders').once('value').then(snap => {
+            const orders = snap.val() || {};
+            const list = Object.values(orders).sort((a, b) => (b.id || 0) - (a.id || 0));
+            let html = '';
 
-function renderAdminData() {
-    const area = document.getElementById('admin-dynamic-content');
-    if (!area) return;
+            list.forEach(o => {
+                const shouldShow = isHistory ? o.status !== 'pending' : o.status === 'pending';
+                if (!shouldShow) return;
+                const status = String(o.status || 'pending');
+                const statusColor = status === 'pending' ? '#f59e0b' : (status === 'completed' ? '#10b981' : '#ef4444');
+                html += `
+                <div class="adm-order-box" style="border-left:5px solid ${statusColor}; padding:12px; margin-bottom:12px; border-radius:15px; background:#1e293b; box-shadow:0 4px 12px rgba(0,0,0,0.2); border-top:1px solid #334155; border-right:1px solid #334155; border-bottom:1px solid #334155;">
+                    <div class="order-header" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                        <div>
+                            <b style="font-size:14px; color:#f1f5f9;">@${escapeHtml(getOrderOwnerLabel(o))}</b><br>
+                            <small style="color:#94a3b8; font-size:11px;">${escapeHtml(o.sender || '---')}</small>
+                        </div>
+                        <span class="status-badge" style="position:static; background:${statusColor}20; color:${statusColor}; font-size:10px; padding:4px 8px; border-radius:8px; font-weight:800;">${escapeHtml(status.toUpperCase())}</span>
+                    </div>
 
-    if(ordersListener) db.ref('orders').off('value', ordersListener);
+                    <div class="order-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; margin-bottom:10px;">
+                        <div class="grid-item" style="background:#0f172a; padding:6px; border-radius:8px; border:1px solid #334155;">
+                            <small style="font-size:9px; color:#94a3b8; font-weight:700;">COIN</small>
+                            <b style="display:block; font-size:12px; color:#f1f5f9;">${escapeHtml(o.coin || '---')}</b>
+                        </div>
+                        <div class="grid-item" style="background:#0f172a; padding:6px; border-radius:8px; border:1px solid #334155;">
+                            <small style="font-size:9px; color:#94a3b8; font-weight:700;">METHOD</small>
+                            <b style="display:block; font-size:12px; color:#f1f5f9;">${escapeHtml(o.method || '---')}</b>
+                        </div>
+                        <div class="grid-item" style="background:#0f172a; padding:6px; border-radius:8px; border:1px solid #334155;">
+                            <small style="font-size:9px; color:#94a3b8; font-weight:700;">ASSET</small>
+                            <b style="display:block; font-size:12px; color:#f1f5f9;">${escapeHtml(o.amt || '---')}</b>
+                        </div>
+                        <div class="grid-item" style="background:#064e3b; padding:6px; border-radius:8px; border:1px solid #065f46;">
+                            <small style="font-size:9px; color:#6ee7b7; font-weight:700;">PAYOUT</small>
+                            <b style="display:block; font-size:12px; color:#10b981;">${formatMoney(o.payable)}</b>
+                        </div>
+                    </div>
 
-    if(adminActiveTab === 'settings') {
-        renderSettingsUI(area); 
-    } else {
-        ordersListener = db.ref('orders').on('value', s => {
-            const orders = s.val() || {};
-            let html = "";
-            Object.values(orders).reverse().forEach(o => {
-                const isHistory = (adminActiveTab === 'history');
-                const shouldShow = isHistory ? (o.status !== 'pending') : (o.status === 'pending');
+                    <div onclick="copyToClipboard('${String(o.number || '').replace(/'/g, "\\'")}')" style="padding:8px; background:#334155; border-radius:10px; border:1px dashed #475569; cursor:pointer; margin-bottom:8px;">
+                        <small style="color:#94a3b8; display:block; font-size:9px; font-weight:800; text-transform:uppercase;">Tap to copy</small>
+                        <b style="color:#60a5fa; font-size:13px;">📱 ${escapeHtml(o.number || '---')}</b>
+                    </div>
 
-                if (shouldShow) {
-                    const statusColor = o.status === 'pending' ? '#f59e0b' : (o.status === 'completed' ? '#10b981' : '#ef4444');
-                    
-                    // Dark Mode Optimized Colors
-                    const boxBg = "#1e293b";      // Card Background
-                    const gridItemBg = "#0f172a"; // Inner Box Background
-                    const textColor = "#f1f5f9";  // Main Text
-                    const mutedText = "#94a3b8"; // Small Text
-                    const copyBg = "#334155";    // Copy area background
+                    <div style="padding-left:4px; margin-bottom:10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                        <small style="color:#94a3b8; font-size:9px; font-weight:700;">TARGET: ${escapeHtml(o.targetId || '---')}</small>
+                        <small style="color:#94a3b8; font-size:9px; font-weight:700;">RATE: ${parseFloat(o.appliedRate || 0)}৳</small>
+                    </div>
 
-                    html += `
-    <div class="adm-order-box" style="border-left: 5px solid ${statusColor}; padding: 12px; margin-bottom: 12px; border-radius: 15px; background: ${boxBg}; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border-top: 1px solid #334155; border-right: 1px solid #334155; border-bottom: 1px solid #334155;">
-        <div class="order-header" style="margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-            <b style="font-size: 14px; color: ${textColor};">@${o.user}</b>
-            <span class="status-badge" style="background:${statusColor}20; color:${statusColor}; font-size: 10px; padding: 4px 8px; border-radius: 8px; font-weight: 800;">${o.status.toUpperCase()}</span>
-        </div>
-        
-        <div class="order-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px;">
-            <div class="grid-item" style="background: ${gridItemBg}; padding: 6px; border-radius: 8px; border: 1px solid #334155;">
-                <small style="font-size: 9px; color: ${mutedText}; font-weight: 700;">COIN</small>
-                <b style="display: block; font-size: 12px; color: ${textColor};">${o.coin}</b>
-            </div>
-            <div class="grid-item" style="background: ${gridItemBg}; padding: 6px; border-radius: 8px; border: 1px solid #334155;">
-                <small style="font-size: 9px; color: ${mutedText}; font-weight: 700;">METHOD</small>
-                <b style="display: block; font-size: 12px; color: ${textColor};">${o.method}</b>
-            </div>
-            <div class="grid-item" style="background: ${gridItemBg}; padding: 6px; border-radius: 8px; border: 1px solid #334155;">
-                <small style="font-size: 9px; color: ${mutedText}; font-weight: 700;">ASSET</small>
-                <b style="display: block; font-size: 12px; color: ${textColor};">${o.amt}</b>
-            </div>
-            <div class="grid-item" style="background: #064e3b; padding: 6px; border-radius: 8px; border: 1px solid #065f46;">
-                <small style="font-size: 9px; color: #6ee7b7; font-weight: 700;">PAYOUT</small>
-                <b style="display: block; font-size: 12px; color: #10b981;">${o.payable}৳</b>
-            </div>
-        </div>
-
-        <div onclick="copyToClipboard('${o.number}')" style="padding: 8px; background: ${copyBg}; border-radius: 10px; border: 1px dashed #475569; cursor: pointer; margin-bottom: 8px;">
-            <small style="color: ${mutedText}; display: block; font-size: 9px; font-weight: 800; text-transform: uppercase;">Tap to copy</small>
-            <b style="color: #60a5fa; font-size: 13px;">📱 ${o.number}</b>
-        </div>
-
-        <div style="padding-left: 4px; margin-bottom: 10px;">
-            <small style="color: ${mutedText}; font-size: 9px; font-weight: 700;">SENDER:</small>
-            <b style="font-size: 11px; color: ${textColor};"> ${o.sender}</b>
-        </div>
-
-        <div style="display: flex; gap: 8px;">
-            ${o.status === 'pending' ? `
-                <button onclick="updateOrderStatus('${o.id}','completed','${o.user}',${o.payable})" style="flex: 2; background: #10b981; color: white; border: none; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;">APPROVE</button>
-                <button onclick="updateOrderStatus('${o.id}','rejected')" style="flex: 1; background: #450a0a; color: #f87171; border: 1px solid #7f1d1d; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;">REJECT</button>
-            ` : ''}
-            <button onclick="if(confirm('Delete?')) db.ref('orders/${o.id}').remove()" style="background: #334155; border: none; width: 38px; height: 38px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white;">🗑️</button>
-        </div>
-    </div>`;
-                }
+                    <div style="display:flex; gap:8px;">
+                        ${status === 'pending' ? `
+                            <button onclick="updateOrderStatus('${o.id}','completed','${String(getOrderOwnerLabel(o)).replace(/'/g, "\\'")}',${parseFloat(o.payable || 0)})" style="flex:2; background:#10b981; color:white; border:none; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">APPROVE</button>
+                            <button onclick="updateOrderStatus('${o.id}','rejected')" style="flex:1; background:#450a0a; color:#f87171; border:1px solid #7f1d1d; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">REJECT</button>` : ''}
+                        <button onclick="deleteOrder('${o.id}')" style="background:none; border:1px solid #ef4444; color:#ef4444; padding:10px 12px; border-radius:10px; font-size:14px; cursor:pointer;">🗑️</button>
+                    </div>
+                </div>`;
             });
-            area.innerHTML = html || "<center style='padding:50px; color:#64748b;'>No Records Found</center>";
+
+            area.innerHTML = html || "<center style='padding:30px; color:#64748b;'>No records found.</center>";
         });
     }
-}
 
-function copyToClipboard(val) {
-    if (!val) return;
-    const dummy = document.createElement("textarea");
-    document.body.appendChild(dummy);
-    dummy.value = val;
-    dummy.select();
-    document.execCommand("copy");
-    document.body.removeChild(dummy);
-    alert("✅ Number Copied: " + val);
-}
-
-
-function renderSettingsUI(container) {
-    const cardBg = "#1e293b";
-    const innerBg = "#0f172a";
-    const borderColor = "#334155";
-    const textColor = "#f1f5f9";
-
-    container.innerHTML = `
-<div style="margin-top:20px;">
-<h4 style="margin-top:25px; margin-bottom:15px; color:#fff;">⚙️ Custom Limits</h4>
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
-    <input type="number" id="adm-min-admin-coin" class="adm-input" placeholder="Min Admin Rate">
-    <input type="number" id="adm-min-submit-coin" class="adm-input" placeholder="Min Submit Coin">
-</div>
-<button onclick="updateCustomLimits()" class="adm-btn" style="background:#3b82f6; color:white;">UPDATE LIMITS</button>
-</div>
-
-        <div class="settings-card" style="background:${cardBg}; padding:15px; border-radius:20px; border:1px solid ${borderColor}; color: ${textColor};">
-            <h4 style="margin-bottom:15px; color:#fff;">💎 Market Rates & Config</h4>
+    function renderSettingsUI(container) {
+        container.innerHTML = `
+        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+            <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">💎 Market Rates & Config</h4>
             <div id="adm-market-config-list">Loading market data...</div>
-            
-            <div style="background:${innerBg}; padding:15px; border-radius:15px; border:1px dashed #475569; margin-bottom:20px;">
-                <small style="font-weight:800; display:block; margin-bottom:8px; color:#94a3b8;">+ ADD NEW COIN</small>
-                <input type="text" id="new-c-name" class="adm-input" placeholder="Coin Name">
-                <input type="text" id="new-c-tid" class="adm-input" placeholder="Address/UID">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                    <input type="number" id="new-c-user" class="adm-input" placeholder="User Rate">
-                    <input type="number" id="new-c-admin" class="adm-input" placeholder="Admin Rate">
-                </div>
-                <button onclick="addNewCoin()" class="adm-btn" style="background:#10b981; color:white;">ADD COIN</button>
-            </div>
+        </div>
 
-            <h4 style="margin-bottom:15px; color:#fff;">💳 Payment Methods</h4>
+        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+            <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">➕ Add New Coin</h4>
+            <input type="text" id="new-c-name" class="adm-input" placeholder="Coin Name">
+            <input type="text" id="new-c-tid" class="adm-input" placeholder="Address / UID">
+            <div class="admin-grid-2">
+                <input type="number" id="new-c-user" class="adm-input" placeholder="User Rate">
+                <input type="number" id="new-c-admin" class="adm-input" placeholder="Admin Rate">
+            </div>
+            <div class="admin-grid-2">
+                <input type="number" id="new-c-limit" class="adm-input" placeholder="Submit Limit">
+                <input type="number" id="new-c-admin-min" class="adm-input" placeholder="Admin Rate From Qty">
+            </div>
+            <button onclick="addNewCoin()" class="adm-btn" style="background:#10b981; color:white;">ADD COIN</button>
+        </div>
+
+        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+            <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">💳 Payment Methods</h4>
             <div id="adm-payment-list"></div>
             <div style="display:flex; gap:8px; margin-top:10px;">
                 <input type="text" id="new-pay-name" class="adm-input" placeholder="New Method" style="margin:0;">
-                <button onclick="addNewPayment()" class="adm-btn" style="width:80px; background:#3b82f6; color:white;">ADD</button>
+                <button onclick="addNewPayment()" class="adm-btn" style="width:90px; background:#3b82f6; color:white;">ADD</button>
             </div>
+        </div>
 
-            <h4 style="margin-top:25px; margin-bottom:15px; color:#fff;">🔗 Social Links</h4>
+        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+            <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">🔗 Social Links</h4>
             <input type="text" id="adm-link-chan" class="adm-input" placeholder="Channel Link">
             <input type="text" id="adm-link-help" class="adm-input" placeholder="Support Link">
             <button onclick="updateAdmLinks()" class="adm-btn" style="background:#2563eb; color:white;">UPDATE LINKS</button>
+        </div>
 
-            <h4 style="margin-top:25px; margin-bottom:15px; color:#fff;">🏆 Leaderboard</h4>
-            <div id="adm-leaderboard-list" style="background:#0f172a; border-radius:12px; padding:10px; max-height:200px; overflow-y:auto; border: 1px solid ${borderColor};"></div>
-            
-            <button onclick="resetSalesStats()" class="adm-btn" style="background:#ef4444; color:white; margin-top:30px;">⚠️ RESET SALES STATS</button>
+        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+            <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">🎥 Tutorial Video</h4>
+            <input type="text" id="adm-tutorial-title" class="adm-input" placeholder="Tutorial Title">
+            <input type="file" id="adm-tutorial-file" class="adm-input" accept="video/*" onchange="handleTutorialFileSelected(event)">
+            <input type="text" id="adm-tutorial-url" class="adm-input" placeholder="Paste YouTube link or uploaded video URL">
+            <div id="adm-tutorial-upload-note" class="admin-small-note">Choose a video and upload it, or paste a YouTube link and save.</div>
+            <div class="admin-grid-2" style="margin-top:10px;">
+                <button onclick="uploadTutorialVideoFile()" class="adm-btn" style="background:#10b981; color:white;">UPLOAD VIDEO</button>
+                <button onclick="updateTutorialVideo()" class="adm-btn" style="background:#2563eb; color:white;">SAVE LINK</button>
+            </div>
+            <button onclick="removeTutorialVideo()" class="adm-btn" style="background:#ef4444; color:white; margin-top:10px;">REMOVE TUTORIAL</button>
+        </div>
+
+        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+            <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">🏆 Leaderboard</h4>
+            <div id="adm-leaderboard-list" style="background:#0f172a; border-radius:12px; padding:10px; max-height:220px; overflow-y:auto; border:1px solid #334155;"></div>
+        </div>
+
+        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+            <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">⚠️ Sales Stats</h4>
+            <button onclick="resetSalesStats()" class="adm-btn" style="background:#ef4444; color:white;">RESET SALES STATS</button>
         </div>`;
-    fetchAdminSettingsData();
-}
-
-function fetchAdminSettingsData() {
-    const borderColor = "#334155";
-    const textColor = "#f1f5f9";
-    const innerBg = "#0f172a";
-
-    db.ref('leaderboard').on('value', s => {
-        let h = "";
-        s.forEach(u => {
-            const d = u.val();
-            h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid ${borderColor};">
-                <div><b style="color:${textColor}">@${d.user}</b><br><small style="color:#10b981; font-weight:bold;">${parseFloat(d.totalAmount).toFixed(2)}৳</small></div>
-                <button style="border:none; color:#ef4444; background:none; font-weight:800; cursor:pointer;" onclick="if(confirm('Delete user?')) db.ref('leaderboard/${d.user}').remove()">DEL</button>
-            </div>`;
-        });
-        const lbArea = document.getElementById('adm-leaderboard-list');
-        if(lbArea) lbArea.innerHTML = h || "<center style='color:#64748b; padding:10px;'>No Users</center>";
-    });
-
-    db.ref('marketConfig').on('value', snap => {
-        let html = "";
-        snap.forEach(c => {
-            const v = c.val();
-            html += `
-            <div style="background:#1e293b; border:1px solid ${borderColor}; border-radius:15px; padding:12px; margin-bottom:10px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <b style="color:#fff;">💎 ${c.key}</b>
-                    <label class="adm-switch"><input type="checkbox" ${v.status?'checked':''} onchange="db.ref('marketConfig/${c.key}').update({status:this.checked})"><span class="adm-slider"></span></label>
-                </div>
-                <input type="text" class="adm-input" value="${v.transferId}" onchange="db.ref('marketConfig/${c.key}').update({transferId: this.value})" style="margin-top:8px; background:#0f172a; border-color:${borderColor};">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                    <div style="background:${innerBg}; padding:5px; border-radius:8px; text-align:center; border: 1px solid ${borderColor};"><small style="font-size:8px; color:#94a3b8;">USER</small><br><input type="number" value="${v.userRate}" onchange="db.ref('marketConfig/${c.key}').update({userRate: parseFloat(this.value)})" style="width:100%; border:none; background:transparent; font-weight:800; text-align:center; color:#fff;"></div>
-                    <div style="background:${innerBg}; padding:5px; border-radius:8px; text-align:center; border: 1px solid ${borderColor};"><small style="font-size:8px; color:#94a3b8;">ADMIN</small><br><input type="number" value="${v.adminRate}" onchange="db.ref('marketConfig/${c.key}').update({adminRate: parseFloat(this.value)})" style="width:100%; border:none; background:transparent; font-weight:800; text-align:center; color:#fff;"></div>
-                </div>
-                <button class="adm-btn" style="color:#f87171; background:none; font-size:11px; margin-top:5px; font-weight:bold;" onclick="if(confirm('Remove?')) db.ref('marketConfig/${c.key}').remove()">REMOVE COIN</button>
-            </div>`;
-        });
-        const mcArea = document.getElementById('adm-market-config-list');
-        if(mcArea) mcArea.innerHTML = html;
-    });
-
-    db.ref('paymentMethods').on('value', s => {
-        let h = "";
-        s.forEach(p => {
-            h += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid ${borderColor}; align-items:center; color:${textColor}">
-                <span>${p.key}</span>
-                <div style="display:flex; gap:12px; align-items:center;">
-                    <label class="adm-switch"><input type="checkbox" ${p.val().status?'checked':''} onchange="db.ref('paymentMethods/${p.key}').update({status:this.checked})"><span class="adm-slider"></span></label>
-                    <button style="border:none; color:#ef4444; background:none; cursor:pointer; font-size:16px;" onclick="db.ref('paymentMethods/${p.key}').remove()">🗑️</button>
-                </div>
-            </div>`;
-        });
-        const pmArea = document.getElementById('adm-payment-list');
-        if(pmArea) pmArea.innerHTML = h;
-    });
-}
-
-/* --- ACTION FUNCTIONS --- */
-
-function addNewCoin() {
-    const n = document.getElementById('new-c-name').value.trim();
-    const tid = document.getElementById('new-c-tid').value.trim();
-    const ur = document.getElementById('new-c-user').value;
-    const ar = document.getElementById('new-c-admin').value;
-    if(n && tid && ur && ar) {
-        db.ref('marketConfig/'+n).set({ transferId: tid, userRate: parseFloat(ur), adminRate: parseFloat(ar), status: true })
-        .then(() => alert("Added!"));
+        fetchAdminSettingsData();
     }
-}
 
-function addNewPayment() {
-    const name = document.getElementById('new-pay-name').value.trim();
-    if(name) db.ref('paymentMethods/'+name).set({status: true});
-}
-
-function updateAdmLinks() {
-    db.ref('settings/links').set({
-        channel: document.getElementById('adm-link-chan').value,
-        help: document.getElementById('adm-link-help').value
-    }).then(() => alert("Updated!"));
-}
-
-function updateOrderStatus(id, status, user, payable) {
-    db.ref('orders/' + id).update({ status: status }).then(() => {
-        // Order completed holei leaderboard-e add hobe
-        if (status === 'completed' && user && user !== 'undefined') {
-            const ldrRef = db.ref('leaderboard/' + user);
-            ldrRef.once('value', sn => {
-                let d = sn.val() || { totalAmount: 0, user: user };
-                let newTotal = (parseFloat(d.totalAmount) || 0) + (parseFloat(payable) || 0);
-                
-                ldrRef.update({ 
-                    totalAmount: newTotal, 
-                    user: user 
-                });
+    function fetchAdminSettingsData() {
+        db.ref('leaderboard').on('value', s => {
+            let h = '';
+            s.forEach(u => {
+                const d = u.val() || {};
+                h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #334155; gap:12px;">
+                    <div><b style="color:#f1f5f9">@${escapeHtml(d.user || 'unknown')}</b><br><small style="color:#10b981; font-weight:bold;">${formatMoney(d.totalAmount)}</small></div>
+                    <button style="border:none; color:#ef4444; background:none; font-weight:800; cursor:pointer;" onclick="deleteLeaderboardUser('${String(d.user || '').replace(/'/g, "\\'")}')">DEL</button>
+                </div>`;
             });
-        }
-        alert("Order " + status + "!");
-    });
-}
+            const lbArea = document.getElementById('adm-leaderboard-list');
+            if (lbArea) lbArea.innerHTML = h || "<center style='color:#64748b; padding:10px;'>No Users</center>";
+        });
 
-function resetSalesStats() {
-    if(confirm("Reset Stats?")) {
+        db.ref('marketConfig').on('value', snap => {
+            let html = '';
+            snap.forEach(c => {
+                const v = c.val() || {};
+                html += `
+                <div style="background:#1e293b; border:1px solid #334155; border-radius:15px; padding:12px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                        <b style="color:#fff;">💎 ${escapeHtml(c.key)}</b>
+                        <label class="adm-switch"><input type="checkbox" ${v.status !== false ? 'checked' : ''} onchange="db.ref('marketConfig/${c.key}').update({status:this.checked})"><span class="adm-slider"></span></label>
+                    </div>
+                    <input type="text" class="adm-input" value="${escapeHtml(v.transferId || '')}" onchange="db.ref('marketConfig/${c.key}').update({transferId: this.value})" style="margin-top:8px; background:#0f172a; border-color:#334155;">
+                    <div class="admin-grid-2">
+                        <div style="background:#0f172a; padding:8px; border-radius:8px; text-align:center; border:1px solid #334155;"><small style="font-size:8px; color:#94a3b8;">USER</small><br><input type="number" value="${Number(v.userRate || 0)}" onchange="db.ref('marketConfig/${c.key}').update({userRate: parseFloat(this.value || 0)})" style="width:100%; border:none; background:transparent; font-weight:800; text-align:center; color:#fff;"></div>
+                        <div style="background:#0f172a; padding:8px; border-radius:8px; text-align:center; border:1px solid #334155;"><small style="font-size:8px; color:#94a3b8;">ADMIN</small><br><input type="number" value="${Number(v.adminRate || 0)}" onchange="db.ref('marketConfig/${c.key}').update({adminRate: parseFloat(this.value || 0)})" style="width:100%; border:none; background:transparent; font-weight:800; text-align:center; color:#fff;"></div>
+                    </div>
+                    <div class="admin-grid-2">
+                        <input type="number" class="adm-input" value="${normalizeSubmitLimit(v.submitLimit)}" onchange="db.ref('marketConfig/${c.key}').update({submitLimit: normalizeSubmitLimit(this.value)})" placeholder="Submit Limit">
+                        <input type="number" class="adm-input" value="${normalizeAdminMinQty(v.adminMinQty)}" onchange="db.ref('marketConfig/${c.key}').update({adminMinQty: normalizeAdminMinQty(this.value)})" placeholder="Admin Rate From Qty">
+                    </div>
+                    <button class="adm-btn" style="color:#f87171; background:none; font-size:11px; margin-top:5px; font-weight:bold; border:1px solid #7f1d1d;" onclick="removeCoin('${String(c.key).replace(/'/g, "\\'")}')">REMOVE COIN</button>
+                </div>`;
+            });
+            const mcArea = document.getElementById('adm-market-config-list');
+            if (mcArea) mcArea.innerHTML = html || "<center style='color:#64748b; padding:10px;'>No coins found</center>";
+        });
+
+        db.ref('paymentMethods').on('value', s => {
+            let h = '';
+            s.forEach(p => {
+                const pv = p.val() || {};
+                h += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #334155; align-items:center; color:#f1f5f9; gap:12px;">
+                    <span>${escapeHtml(p.key)}</span>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <label class="adm-switch"><input type="checkbox" ${pv.status !== false ? 'checked' : ''} onchange="db.ref('paymentMethods/${p.key}').update({status:this.checked})"><span class="adm-slider"></span></label>
+                        <button style="border:none; color:#ef4444; background:none; cursor:pointer; font-size:16px;" onclick="removePayment('${String(p.key).replace(/'/g, "\\'")}')">🗑️</button>
+                    </div>
+                </div>`;
+            });
+            const pmArea = document.getElementById('adm-payment-list');
+            if (pmArea) pmArea.innerHTML = h || "<center style='color:#64748b; padding:10px;'>No methods found</center>";
+        });
+
+        db.ref('settings/links').once('value').then(s => {
+            const data = s.val() || {};
+            const chan = document.getElementById('adm-link-chan');
+            const help = document.getElementById('adm-link-help');
+            if (chan) chan.value = data.channel || '';
+            if (help) help.value = data.help || '';
+        });
+
+        db.ref('settings/tutorial').once('value').then(s => {
+            currentTutorialData = s.val() || null;
+            const data = currentTutorialData || {};
+            const title = document.getElementById('adm-tutorial-title');
+            const url = document.getElementById('adm-tutorial-url');
+            const note = document.getElementById('adm-tutorial-upload-note');
+            if (title) title.value = data.title || '';
+            if (url) url.value = data.url || '';
+            if (note) note.innerText = data.url ? 'Tutorial already saved. Upload a new one or replace the link.' : 'Choose a video and upload it, or paste a YouTube link and save.';
+        });
+    }
+
+    function addNewCoin() {
+        const n = document.getElementById('new-c-name').value.trim();
+        const tid = document.getElementById('new-c-tid').value.trim();
+        const ur = parseFloat(document.getElementById('new-c-user').value || 0);
+        const ar = parseFloat(document.getElementById('new-c-admin').value || 0);
+        const sl = normalizeSubmitLimit(document.getElementById('new-c-limit').value);
+        const adminMinQty = normalizeAdminMinQty(document.getElementById('new-c-admin-min').value);
+        if (!n || !tid || !ur || !ar) return notify('Fill all coin fields.');
+        db.ref('marketConfig/' + n).set({ transferId: tid, userRate: ur, adminRate: ar, submitLimit: sl, adminMinQty, status: true }).then(() => {
+            document.getElementById('new-c-name').value = '';
+            document.getElementById('new-c-tid').value = '';
+            document.getElementById('new-c-user').value = '';
+            document.getElementById('new-c-admin').value = '';
+            document.getElementById('new-c-limit').value = '';
+            document.getElementById('new-c-admin-min').value = '';
+            notify('Coin added successfully!');
+        });
+    }
+
+    function removeCoin(key) {
+        if (!confirm(`Remove ${key}?`)) return;
+        db.ref('marketConfig/' + key).remove();
+    }
+
+    function addNewPayment() {
+        const name = document.getElementById('new-pay-name').value.trim();
+        if (!name) return notify('Enter payment method name.');
+        db.ref('paymentMethods/' + name).set({ status: true }).then(() => {
+            document.getElementById('new-pay-name').value = '';
+            notify('Payment method added!');
+        });
+    }
+
+    function removePayment(key) {
+        if (!confirm(`Remove ${key}?`)) return;
+        db.ref('paymentMethods/' + key).remove();
+    }
+
+    function updateAdmLinks() {
+        db.ref('settings/links').set({
+            channel: document.getElementById('adm-link-chan').value.trim(),
+            help: document.getElementById('adm-link-help').value.trim()
+        }).then(() => notify('Links updated!'));
+    }
+
+    function handleTutorialFileSelected(event) {
+        const file = event && event.target && event.target.files ? event.target.files[0] : null;
+        const note = document.getElementById('adm-tutorial-upload-note');
+        if (!file) {
+            if (note) note.innerText = 'Choose a video and upload it, or paste a YouTube link and save.';
+            return;
+        }
+        if (!String(file.type || '').startsWith('video/')) {
+            event.target.value = '';
+            if (note) note.innerText = 'Only video files are allowed.';
+            return notify('Please choose a video file.');
+        }
+        if (note) note.innerText = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+    }
+
+    function uploadTutorialVideoFile() {
+        const fileInput = document.getElementById('adm-tutorial-file');
+        const titleInput = document.getElementById('adm-tutorial-title');
+        const urlInput = document.getElementById('adm-tutorial-url');
+        const note = document.getElementById('adm-tutorial-upload-note');
+        const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+        if (!file) return notify('Select a video file first.');
+        if (!String(file.type || '').startsWith('video/')) return notify('Only video files are allowed.');
+        if (tutorialUploadInProgress) return notify('Video upload already in progress.');
+
+        tutorialUploadInProgress = true;
+        const safeName = String(file.name || 'tutorial-video').replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = `tutorials/${Date.now()}_${safeName}`;
+        const ref = storage.ref(path);
+        const task = ref.put(file, { contentType: file.type || 'video/mp4' });
+        if (note) note.innerText = 'Uploading: 0%';
+
+        task.on('state_changed', snap => {
+            const total = parseFloat(snap.totalBytes || 0);
+            const done = parseFloat(snap.bytesTransferred || 0);
+            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+            if (note) note.innerText = `Uploading: ${percent}%`;
+        }, err => {
+            tutorialUploadInProgress = false;
+            console.error(err);
+            if (note) note.innerText = 'Upload failed. Try again.';
+            notify('Video upload failed. Check Firebase Storage rules.');
+        }, () => {
+            ref.getDownloadURL().then(url => {
+                const title = (titleInput && titleInput.value.trim()) || file.name.replace(/\.[^.]+$/, '') || 'Watch Tutorial';
+                const payload = {
+                    title,
+                    url,
+                    storagePath: path,
+                    mimeType: file.type || 'video/mp4',
+                    originalName: file.name || '',
+                    uploadedAt: Date.now()
+                };
+                return db.ref('settings/tutorial').set(payload).then(() => {
+                    tutorialUploadInProgress = false;
+                    currentTutorialData = payload;
+                    if (urlInput) urlInput.value = url;
+                    if (fileInput) fileInput.value = '';
+                    if (note) note.innerText = 'Upload complete!';
+                    notify('Tutorial video uploaded!');
+                });
+            }).catch(err => {
+                tutorialUploadInProgress = false;
+                console.error(err);
+                if (note) note.innerText = 'Could not get download URL.';
+                notify('Upload finished but video URL could not be created.');
+            });
+        });
+    }
+
+    function updateTutorialVideo() {
+        const title = document.getElementById('adm-tutorial-title').value.trim();
+        const url = document.getElementById('adm-tutorial-url').value.trim();
+        if (!url) return notify('Paste a YouTube link or upload a video first.');
+        db.ref('settings/tutorial').update({ title: title || 'Watch Tutorial', url }).then(() => {
+            currentTutorialData = Object.assign({}, currentTutorialData || {}, { title: title || 'Watch Tutorial', url });
+            notify('Tutorial video updated!');
+        });
+    }
+
+    function removeTutorialVideo() {
+        if (!confirm('Remove tutorial video?')) return;
+        const storagePath = String((currentTutorialData && currentTutorialData.storagePath) || '').trim();
+        const removeDb = db.ref('settings/tutorial').remove();
+        const removeStorage = storagePath ? storage.ref(storagePath).delete().catch(() => null) : Promise.resolve();
+        Promise.all([removeDb, removeStorage]).then(() => {
+            currentTutorialData = null;
+            const title = document.getElementById('adm-tutorial-title');
+            const url = document.getElementById('adm-tutorial-url');
+            const fileInput = document.getElementById('adm-tutorial-file');
+            const note = document.getElementById('adm-tutorial-upload-note');
+            if (title) title.value = '';
+            if (url) url.value = '';
+            if (fileInput) fileInput.value = '';
+            if (note) note.innerText = 'Choose a video and upload it, or paste a YouTube link and save.';
+            notify('Tutorial removed.');
+        });
+    }
+
+    function updateOrderStatus(id, status, user, payable) {
+        db.ref('orders/' + id).once('value').then(orderSnap => {
+            const orderData = orderSnap.val() || {};
+            const leaderboardKey = orderData.username || orderData.user || orderData.ownerUid || user;
+            return db.ref('orders/' + id).update({ status }).then(() => {
+                if (status === 'completed' && leaderboardKey && leaderboardKey !== 'undefined') {
+                    const ref = db.ref('leaderboard/' + leaderboardKey);
+                    return ref.once('value').then(snap => {
+                        const data = snap.val() || { totalAmount: 0, user: leaderboardKey };
+                        const newTotal = (parseFloat(data.totalAmount) || 0) + (parseFloat(payable) || 0);
+                        return ref.update({
+                            totalAmount: newTotal,
+                            user: leaderboardKey,
+                            ownerUid: orderData.ownerUid || data.ownerUid || '',
+                            nickname: orderData.nickname || data.nickname || leaderboardKey,
+                            username: orderData.username || data.username || leaderboardKey,
+                            photo: orderData.photo || data.photo || ''
+                        });
+                    });
+                }
+            });
+        }).then(() => {
+            safeHaptic('notify', 'success');
+            notify('Order ' + status + '!');
+            renderAdminData();
+        }).catch(err => notify(err.message));
+    }
+
+    function deleteOrder(id) {
+        if (!confirm('Delete this order?')) return;
+        db.ref('orders/' + id).remove().then(() => notify('Order deleted.'));
+    }
+
+    function deleteLeaderboardUser(username) {
+        if (!confirm(`Remove @${username} from leaderboard?`)) return;
+        db.ref('leaderboard/' + username).remove().then(() => notify('User removed!'));
+    }
+
+    function resetSalesStats() {
+        if (!confirm('Reset Stats?')) return;
         db.ref('orders').once('value', s => {
             let total = 0;
-            Object.values(s.val() || {}).forEach(o => { if(o.status === 'completed') total += parseFloat(o.payable || 0); });
-            db.ref('stats_reset').set({ resetAmount: total }).then(() => alert("Reset!"));
+            Object.values(s.val() || {}).forEach(o => { if (o.status === 'completed') total += parseFloat(o.payable || 0); });
+            db.ref('stats_reset').set({ resetAmount: total, timestamp: Date.now() }).then(() => notify('Reset snapshot saved!'));
         });
     }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    adminActiveTab = 'pending';
-    renderAdminData();
-});
-
-
-// --- CUSTOM LIMITS FEATURE ---
-window.customLimits = { minAdminRate: 0, minSubmitCoin: 5000 };
-db.ref('settings/limits').on('value', snap => { window.customLimits = snap.val() || { minAdminRate:0, minSubmitCoin:5000 }; });
-
-function updateCustomLimits() {
-    const minAdmin = parseFloat(document.getElementById('adm-min-admin-coin').value) || 0;
-    const minSubmit = parseFloat(document.getElementById('adm-min-submit-coin').value) || 0;
-    db.ref('settings/limits').set({ minAdminRate: minAdmin, minSubmitCoin: minSubmit }).then(() => alert("Custom limits updated!"));
-}
-
-// Enforce limits in calculatePayout
-const originalCalculatePayout = calculatePayout;
-calculatePayout = function() {
-    const qty = parseFloat(document.getElementById('input-qty').value) || 0;
-    const limits = window.customLimits;
-    const appliedRate = qty >= 100000 ? Math.max(currentCoinAdminRate, limits.minAdminRate) : currentCoinRate;
-    const raw = (qty/1000) * appliedRate;
-    calculatedFinalPayout = (raw>5 && qty>=limits.minSubmitCoin) ? Number(raw-5).toFixed(2) : "0.00";
-    document.getElementById('display-final-payout').innerText = calculatedFinalPayout + " ৳";
-};
-
-// Enforce minimum submit coin in showConfirmation
-const originalShowConfirmation = showConfirmation;
-showConfirmation = function() {
-    const qty = parseFloat(document.getElementById('input-qty').value) || 0;
-    const limits = window.customLimits;
-    if(qty<limits.minSubmitCoin) return alert(`Minimum submit coin is ${limits.minSubmitCoin}`);
-    originalShowConfirmation();
-};
-
 </script>
 </body>
 </html>
