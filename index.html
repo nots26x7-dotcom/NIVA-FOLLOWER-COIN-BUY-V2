@@ -9,390 +9,508 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         /* =========================================
            [SECTION 1] CORE & USER STYLES
            ========================================= */
         :root { 
-    --primary: #22c55e; 
-    --bg: #0f172a;        /* Deep Dark Background */
-    --card: #1e293b;      /* Slate Card Background */
-    --text: #f1f5f9;      /* Light Text */
-    --p-blue: #3b82f6; 
-    --danger: #ef4444; 
-    --success: #10b981; 
-    --warning: #f59e0b; 
-    --border: #334155;    /* Subtle Dark Border */
-}
+            --primary: #22c55e; 
+            --bg: #0b111e;        /* Premium Deep Dark Background */
+            --card: #151f32;      /* Rich Slate Card Background */
+            --text: #f1f5f9;      /* Crystal Light Text */
+            --p-blue: #2563eb; 
+            --danger: #ef4444; 
+            --success: #10b981; 
+            --warning: #f59e0b; 
+            --border: rgba(255, 255, 255, 0.08);    /* Glassmorphic Dark Border */
+        }
 
-* { box-sizing: border-box; font-family: 'Urbanist', sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; color: var(--text); }
+        * { box-sizing: border-box; font-family: 'Urbanist', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: radial-gradient(circle at top left, #12223c 0%, var(--bg) 45%, #050810 100%); 
+            margin: 0; 
+            padding: 16px; 
+            padding-bottom: 120px; 
+            color: var(--text); 
+            min-height: 100vh;
+        }
 
-/* LOADING SCREEN */
-#loading { position: fixed; inset: 0; background: #0f172a; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: 0.5s; }
-.light-box { position: relative; width: 130px; height: 130px; background: #1e293b; border-radius: 35px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
-.light-box::before { content: ''; position: absolute; width: 200%; height: 200%; background: conic-gradient(transparent, transparent, transparent, #3b82f6); animation: rotate 1.5s linear infinite; }
-@keyframes rotate { 100% { transform: rotate(360deg); } }
-.inner-img { position: absolute; inset: 4px; background: #1e293b; border-radius: 32px; z-index: 2; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.inner-img img { width: 100%; height: 100%; object-fit: cover; }
-.loading-title { margin-top: 25px; font-size: 22px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1px; }
+        /* LOADING SCREEN */
+        #loading { 
+            position: fixed; 
+            inset: 0; 
+            background: radial-gradient(circle at center, #172844 0%, #0b111e 60%, #03060a 100%); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 10000; 
+            transition: opacity 0.5s ease-in-out; 
+        }
+        .light-box { 
+            position: relative; 
+            width: 140px; 
+            height: 140px; 
+            background: #142035; 
+            border-radius: 38px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            box-shadow: 0 20px 45px rgba(0,0,0,0.45); 
+        }
+        .light-box::before { 
+            content: ''; 
+            position: absolute; 
+            width: 200%; 
+            height: 200%; 
+            background: conic-gradient(transparent, transparent, transparent, #2563eb, #10b981); 
+            animation: rotate 2s linear infinite; 
+        }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+        .inner-img { 
+            position: absolute; 
+            inset: 5px; 
+            background: #0f182a; 
+            border-radius: 34px; 
+            z-index: 2; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+        }
+        .inner-img img { width: 100%; height: 100%; object-fit: cover; }
+        .loading-title { margin-top: 25px; font-size: 24px; font-weight: 900; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1.5px; }
+        .loading-subtitle { margin-top: 8px; font-size: 13px; font-weight: 600; color: #8da2c7; letter-spacing: 0.5px; }
 
-/* USER UI */
-.help-btn { position: fixed; top: 20px; right: 20px; width: 45px; height: 45px; background: var(--card); border-radius: 15px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 22px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 1000; border: 1.5px solid var(--border); color: #fff; }
-.profile-card { background: linear-gradient(135deg, #1d4ed8, #7c3aed); border-radius: 25px; padding: 22px; color: white; display: flex; align-items: center; margin-bottom: 15px; margin-top: 60px; }
-.user-avatar { width: 60px; height: 60px; border-radius: 18px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; }
-.action-card { background: var(--card); border-radius: 24px; padding: 16px; margin-bottom: 12px; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; }
-.icon-box { width: 45px; height: 45px; border-radius: 15px; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        /* USER UI */
+        .help-btn { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            width: 48px; 
+            height: 48px; 
+            background: var(--card); 
+            border-radius: 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            text-decoration: none; 
+            font-size: 22px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3); 
+            z-index: 1000; 
+            border: 1.5px solid var(--border); 
+            color: #fff; 
+            transition: transform 0.2s;
+        }
+        .help-btn:active { transform: scale(0.92); }
 
-/* Main Coin Card Design */
-.coin-card { 
-    background: #1e293b; 
-    border-radius: 15px; 
-    padding: 12px; 
-    margin-bottom: 12px; 
-    border: 2px solid rgba(34, 197, 94, 0.4); 
-    position: relative; 
-    display: flex;
-    flex-direction: column;
-}
+        .profile-card { 
+            background: linear-gradient(135deg, #1d4ed8, #7c3aed, #10b981); 
+            border-radius: 28px; 
+            padding: 24px; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            margin-top: 60px; 
+            box-shadow: 0 16px 36px rgba(29, 78, 216, 0.25);
+        }
+        .user-avatar { 
+            width: 64px; 
+            height: 64px; 
+            border-radius: 20px; 
+            border: 2.5px solid rgba(255,255,255,0.25); 
+            object-fit: cover; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .action-card { 
+            background: var(--card); 
+            border-radius: 24px; 
+            padding: 18px; 
+            margin-bottom: 16px; 
+            border: 1.5px solid var(--border); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            text-decoration: none; 
+            color: inherit; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: background 0.2s;
+        }
+        .action-card:active { background: #1c2a44; }
+        .icon-box { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 16px; 
+            background: #1e2e4a; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px; 
+            border: 1px solid rgba(255,255,255,0.05);
+        }
 
-/* Status Badge - Right Side Placement */
-.status-badge { 
-    position: absolute; 
-    top: 10px; 
-    right: 10px; 
-    padding: 3px 8px; 
-    border-radius: 6px; 
-    font-size: 8px; 
-    font-weight: 900; 
-    text-transform: uppercase;
-}
-.status-online { background: #064e3b; color: #10b981; }
-.status-offline { background: #FF2E2E; color: #A30000; }
+        /* Main Coin Card Design */
+        .coin-card { 
+            background: var(--card); 
+            border-radius: 24px; 
+            padding: 16px; 
+            margin-bottom: 16px; 
+            border: 1.5px solid rgba(34, 197, 94, 0.25); 
+            position: relative; 
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+        .coin-card:active { transform: scale(0.98); }
 
-/* Sudhu Online card er niche CLICK HERE ashbe */
-.coin-card:not(.offline)::after {
-    content: "CLICK HERE";
-    display: block;
-    width: 100%;
-    text-align: center;
-    margin-top: 12px;
-    font-size: 11px;
-    font-weight: 900;
-    color: #10b981;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    pointer-events: none;
-}
+        /* Status Badge - Right Side Placement */
+        .status-badge { 
+            position: absolute; 
+            top: 14px; 
+            right: 14px; 
+            padding: 5px 11px; 
+            border-radius: 10px; 
+            font-size: 10px; 
+            font-weight: 900; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .status-online { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-offline { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
 
-/* Offline Card Style */
-.coin-card.offline { 
-    opacity: 0.6; 
-    filter: grayscale(0.8); 
-    border-color: #334155; 
-}
-.coin-card.offline::after { content: none; }
+        /* Offline Card Style */
+        .coin-card.offline { 
+            opacity: 0.5; 
+            filter: grayscale(0.8); 
+            border-color: var(--border); 
+            pointer-events: none;
+        }
 
-.rate-grid { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 8px; 
-    margin-top: 8px; 
-}
+        .rate-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-top: 14px; 
+        }
 
-.rate-box { 
-    background: #1e293b; 
-    padding: 10px 8px;    /* Padding ektu barano hoyeche jate mota rate-val ta fit hoy */
-    border-radius: 14px; 
-    text-align: center; 
-    border: 1px solid var(--border); 
-}
-.rate-box small { font-size: 9px; color: #94a3b8; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 4px; }
-.rate-val { 
-    font-size: 13px; 
-    font-weight: 900;     /* Extremely Bold Font */
-    color: #fff; 
-    background: #2563eb; 
-    padding: 8px 4px;     /* Vertical padding bariye mota kora hoyeche */
-    border-radius: 10px;  /* Corner arektu round kora holo muta looker sathe match korte */
-    display: block;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25); /* Shadow ektu barano hoyeche thickness bujhanor jonno */
-    border: 1px solid rgba(255, 255, 255, 0.1);    /* Halka ekta inner border jate thickness sposto hoy */
-}
+        .rate-box { 
+            background: #0f182a; 
+            padding: 12px 10px;
+            border-radius: 16px; 
+            text-align: center; 
+            border: 1px solid var(--border); 
+        }
+        .rate-box small { font-size: 10px; color: #8fa0dd; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .rate-val { 
+            font-size: 14px; 
+            font-weight: 900;
+            color: #fff; 
+            background: linear-gradient(135deg, #1d4ed8, #2563eb); 
+            padding: 8px 4px;
+            border-radius: 12px;
+            display: block;
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .rate-box:last-child .rate-val {
+            background: linear-gradient(135deg, #059669, #10b981);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.2);
+        }
 
-/* SIMPLE CLICK HERE TEXT STYLE */
-.click-here-text {
-    width: 100%;
-    color: #10b981; 
-    font-size: 10px; 
-    font-weight: 900; 
-    margin-top: 5px; 
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    pointer-events: none; 
-}
+        /* SIMPLE CLICK HERE TEXT STYLE */
+        .click-here-text {
+            width: 100%;
+            color: #10b981; 
+            font-size: 11px; 
+            font-weight: 900; 
+            margin-top: 14px; 
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border-top: 1px dashed rgba(255,255,255,0.08);
+            padding-top: 12px;
+        }
 
-/* Offline thakle lekha hide hobe */
-.coin-card.offline .click-here-text {
-    display: none;
-}
+        /* MODALS */
+        .modal-mask { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(4, 7, 13, 0.85); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            display: none; 
+            align-items: flex-end; 
+            z-index: 2000; 
+        }
+        .bottom-sheet { 
+            background: #121b2d; 
+            width: 100%; 
+            border-radius: 40px 40px 0 0; 
+            padding: 30px 24px; 
+            transform: translateY(100%); 
+            transition: transform 0.35s cubic-bezier(0.15, 1, 0.3, 1); 
+            overflow-y: auto; 
+            max-height: 92vh; 
+            color: #fff; 
+            border-top: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.5);
+        }
+        .modal-mask.active .bottom-sheet { transform: translateY(0); }
+        
+        .form-input { 
+            width: 100%; 
+            background: #090e17; 
+            border: 1.5px solid var(--border); 
+            padding: 16px; 
+            border-radius: 20px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            margin-bottom: 16px; 
+            outline: none; 
+            color: #fff; 
+            transition: border-color 0.2s;
+        }
+        .form-input:focus { border-color: #2563eb; }
+        
+        .btn-submit { 
+            background: linear-gradient(135deg, #2563eb, #1d4ed8); 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 18px; 
+            border-radius: 20px; 
+            font-size: 17px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+            transition: background 0.2s;
+        }
+        .btn-submit:active { transform: scale(0.98); }
 
-/* MODALS */
-.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: flex-end; z-index: 2000; }
-.bottom-sheet { background: #1e293b; width: 100%; border-radius: 40px 40px 0 0; padding: 30px; transform: translateY(100%); transition: 0.4s; overflow-y: auto; max-height: 90vh; color: #fff; }
-.modal-mask.active .bottom-sheet { transform: translateY(0); }
-.form-input { width: 100%; background: #0f172a; border: 1.5px solid var(--border); padding: 16px; border-radius: 20px; font-size: 16px; font-weight: 700; margin-bottom: 15px; outline: none; color: #fff; }
-.btn-submit { background: #2563eb; color: white; border: none; width: 100%; padding: 18px; border-radius: 20px; font-size: 17px; font-weight: 800; cursor: pointer; }
+        .nav-dock { 
+            position: fixed; 
+            bottom: 20px; 
+            left: 20px; 
+            right: 20px; 
+            height: 75px; 
+            background: rgba(21, 31, 50, 0.95); 
+            border-radius: 35px; 
+            display: flex; 
+            justify-content: center; 
+            gap: 60px; 
+            align-items: center; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+            z-index: 1001; 
+            border: 1px solid var(--border); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
 
-.nav-dock { 
-  position: fixed; 
-  bottom: 20px; 
-  left: 20px; 
-  right: 20px; 
-  height: 75px; 
-  background: #1e293b; 
-  border-radius: 35px; 
-  
-  /* 3 tar jaygay 2 ta tab er jonno space-center ba space-around thik kora hoise */
-  display: flex; 
-  justify-content: center; 
-  gap: 60px; /* Duita tab er majhkhaner distence ekhane control korte parben */
-  
-  align-items: center; 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4); 
-  z-index: 1001; 
-  border: 1px solid var(--border); 
-}
+        .nav-tab { 
+            border: none; 
+            background: none; 
+            color: #5d7290; 
+            font-size: 24px; 
+            width: 52px; 
+            height: 52px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+        }
 
-.nav-tab { 
-  border: none; 
-  background: none; 
-  color: #64748b; 
-  font-size: 24px; 
-  width: 50px; 
-  height: 50px; 
-  border-radius: 18px; 
-  cursor: pointer; /* Click korar subidhar jonno eta add kora bhalo */
-}
+        .nav-tab.active { 
+            background: linear-gradient(135deg, #2563eb, #10b981); 
+            color: white; 
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        }
 
-.nav-tab.active { 
-  background: var(--p-blue); 
-  color: white; 
-}
+        /* ADMIN BUTTON */
+        #admin-shortcut { display: none; margin-bottom: 20px; padding: 0 5px; }
+        .admin-entry-btn { 
+            width: 100%; 
+            padding: 18px; 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
+            color: white; 
+            border: none; 
+            border-radius: 22px; 
+            font-weight: 900; 
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3); 
+            font-size: 14px; 
+        }
 
-/* ADMIN BUTTON */
-#admin-shortcut { display: none; margin-bottom: 15px; padding: 0 5px; }
-.admin-entry-btn { width: 100%; padding: 18px; background: #ef4444; color: white; border: none; border-radius: 22px; font-weight: 900; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4); font-size: 14px; animation: pulse 2s infinite; }
-
-       /* =========================================
+        /* =========================================
            [SECTION 2] UPDATED MODERN ADMIN UI
            ========================================= */
-        /* ADMIN MASTER UI - DARK MODE */
-#admin-master-ui { 
-    position: fixed; 
-    inset: 0; 
-    background: #0f172a; /* Dark Navy Background */
-    z-index: 100000; 
-    display: none; 
-    overflow-y: auto; 
-    font-family: 'Plus Jakarta Sans', sans-serif; 
-    color: #f1f5f9; 
-}
+        #admin-master-ui { 
+            position: fixed; 
+            inset: 0; 
+            background: #070b12; 
+            z-index: 100000; 
+            display: none; 
+            overflow-y: auto; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            color: #f1f5f9; 
+        }
 
-#admin-lock-screen { 
-    position: fixed; 
-    inset: 0; 
-    background: #020617; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    z-index: 100001; 
-    flex-direction: column; 
-    color: white; 
-}
+        #admin-lock-screen { 
+            position: fixed; 
+            inset: 0; 
+            background: #03060b; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 100001; 
+            flex-direction: column; 
+            color: white; 
+        }
 
-.adm-container { max-width: 500px; margin: 0 auto; padding: 15px; } 
+        .adm-container { max-width: 540px; margin: 0 auto; padding: 20px; padding-bottom: 120px; } 
 
-/* Statistics Box */
-.adm-stats-row { display: block; margin-bottom: 15px; }
-.adm-stat-box { 
-    background: #1e293b; /* Dark Slate Card */
-    padding: 20px; 
-    border-radius: 20px; 
-    border: 1px solid #334155; 
-    text-align: center; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-}
-.adm-stat-box small { 
-    font-weight: 800; 
-    color: #94a3b8; 
-    font-size: 10px; 
-    display: block; 
-    text-transform: uppercase; 
-    letter-spacing: 1px;
-}
-.adm-stat-box h3 { 
-    margin: 5px 0 0; 
-    font-size: 28px; 
-    color: #ffffff; 
-}
+        /* Statistics Box */
+        .adm-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .adm-stat-box { 
+            background: #111a2e; 
+            padding: 16px 10px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            text-align: center; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25); 
+        }
+        .adm-stat-box small { 
+            font-weight: 800; 
+            color: #8da2c7; 
+            font-size: 10px; 
+            display: block; 
+            text-transform: uppercase; 
+            letter-spacing: 0.8px;
+        }
+        .adm-stat-box h3 { 
+            margin: 6px 0 0; 
+            font-size: 24px; 
+            color: #ffffff; 
+            font-weight: 800;
+        }
 
-/* Modern Tab Menu */
-.adm-tab-menu { 
-    display: flex; 
-    background: #1e293b; 
-    border-radius: 15px; 
-    padding: 5px; 
-    margin-bottom: 20px; 
-    gap: 5px;
-    border: 1px solid #334155;
-} 
-.adm-tab { 
-    flex: 1; 
-    text-align: center; 
-    padding: 12px 5px; 
-    font-size: 11px; 
-    font-weight: 800; 
-    cursor: pointer; 
-    border-radius: 12px; 
-    color: #94a3b8; 
-    transition: 0.3s;
-} 
-.adm-tab.active { 
-    background: #334155 !important; 
-    color: #3b82f6 !important; 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
-}
+        /* Modern Tab Menu */
+        .adm-tab-menu { 
+            display: flex; 
+            background: #111a2e; 
+            border-radius: 18px; 
+            padding: 6px; 
+            margin-bottom: 20px; 
+            gap: 6px;
+            border: 1px solid rgba(255,255,255,0.08);
+        } 
+        .adm-tab { 
+            flex: 1; 
+            text-align: center; 
+            padding: 12px 5px; 
+            font-size: 12px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            border-radius: 12px; 
+            color: #8da2c7; 
+            transition: 0.25s;
+        } 
+        .adm-tab.active { 
+            background: #2563eb !important; 
+            color: #ffffff !important; 
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35); 
+        }
 
-/* Order Card - Grid Design */
-.adm-order-box { 
-    background: #1e293b; 
-    border-radius: 20px; 
-    padding: 18px; 
-    margin-bottom: 15px; 
-    border: 1px solid #334155; 
-    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-    position: relative; 
-    overflow: hidden;
-}
-.order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* Order Card - Grid Design */
+        .adm-order-box { 
+            background: #111a2e; 
+            border-radius: 24px; 
+            padding: 20px; 
+            margin-bottom: 16px; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative; 
+            overflow: hidden;
+        }
+        .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-.grid-item { 
-    background: #0f172a; 
-    padding: 12px; 
-    border-radius: 15px; 
-    border: 1px solid #334155; 
-}
-.grid-item small { 
-    display: block; 
-    color: #64748b; 
-    font-size: 9px; 
-    font-weight: 800; 
-    text-transform: uppercase; 
-    margin-bottom: 3px; 
-}
-.grid-item b { font-size: 11px; color: #e2e8f0; }
+        .grid-item { 
+            background: #080f1d; 
+            padding: 12px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+        }
+        .grid-item small { 
+            display: block; 
+            color: #8da2c7; 
+            font-size: 9px; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            margin-bottom: 4px; 
+            letter-spacing: 0.5px;
+        }
+        .grid-item b { font-size: 13px; color: #f1f5f9; font-weight: 700; }
 
-.status-badge { 
-    font-size: 10px; 
-    font-weight: 900; 
-    padding: 5px 12px; 
-    border-radius: 10px; 
-    text-transform: uppercase; 
-}
+        .status-badge { 
+            font-size: 10px; 
+            font-weight: 900; 
+            padding: 5px 12px; 
+            border-radius: 10px; 
+            text-transform: uppercase; 
+        }
 
-/* Forms & Buttons */
-.adm-input { 
-    width: 100%; 
-    padding: 12px; 
-    border-radius: 12px; 
-    border: 1px solid #334155; 
-    margin-bottom: 10px; 
-    font-size: 13px; 
-    background: #0f172a; 
-    color: #ffffff;
-    outline: none;
-}
-.adm-input::placeholder { color: #475569; }
+        /* Forms & Buttons */
+        .adm-input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            margin-bottom: 12px; 
+            font-size: 14px; 
+            background: #080f1d; 
+            color: #ffffff;
+            outline: none;
+            font-weight: 600;
+        }
+        .adm-input::placeholder { color: #50617a; }
 
-.adm-btn { 
-    border: none; 
-    padding: 12px; 
-    border-radius: 12px; 
-    font-weight: 800; 
-    cursor: pointer; 
-    width: 100%; 
-    transition: 0.2s; 
-    background: #2563eb;
-    color: white;
-}
+        .adm-btn { 
+            border: none; 
+            padding: 14px; 
+            border-radius: 16px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            width: 100%; 
+            transition: background 0.2s; 
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.2);
+        }
+        .adm-btn:active { transform: scale(0.98); }
     
-/* ADMIN TOGGLE + EXTRA STATS */
-.adm-stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:15px; }
-@media (max-width: 520px) { .adm-stats-row { grid-template-columns:1fr; } }
-.adm-switch { position: relative; display: inline-block; width: 52px; height: 28px; }
-.adm-switch input { opacity: 0; width: 0; height: 0; }
-.adm-slider { position:absolute; cursor:pointer; inset:0; background:#334155; border-radius:999px; transition:.2s; }
-.adm-slider:before { content:""; position:absolute; height:20px; width:20px; left:4px; top:4px; background:white; border-radius:50%; transition:.2s; }
-.adm-switch input:checked + .adm-slider { background:#2563eb; }
-.adm-switch input:checked + .adm-slider:before { transform:translateX(24px); }
-.admin-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.admin-small-note { font-size:12px; color:#94a3b8; line-height:1.5; }
+        .adm-switch { position: relative; display: inline-block; width: 52px; height: 28px; }
+        .adm-switch input { opacity: 0; width: 0; height: 0; }
+        .adm-slider { position:absolute; cursor:pointer; inset:0; background:rgba(255,255,255,0.1); border-radius:999px; transition:.2s; }
+        .adm-slider:before { content:""; position:absolute; height:20px; width:20px; left:4px; top:4px; background:white; border-radius:50%; transition:.2s; }
+        .adm-switch input:checked + .adm-slider { background: linear-gradient(135deg, #2563eb, #10b981); }
+        .adm-switch input:checked + .adm-slider:before { transform:translateX(24px); }
+        .admin-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .admin-small-note { font-size:12px; color:#8da2c7; line-height:1.5; }
 
-/* SENDER TYPE TOGGLE */
-.sender-type-toggle {
-    display: flex;
-    gap: 6px;
-    margin-top: 8px;
-    margin-bottom: 2px;
-}
-.sender-type-btn {
-    flex: 1;
-    padding: 9px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 800;
-    cursor: pointer;
-    border: 1.5px solid #334155;
-    background: #0f172a;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: all 0.2s;
-    text-align: center;
-}
-.sender-type-btn.active-username {
-    background: #1d4ed820;
-    border-color: #3b82f6;
-    color: #3b82f6;
-}
-.sender-type-btn.active-code {
-    background: #7c3aed20;
-    border-color: #a78bfa;
-    color: #a78bfa;
-}
-.sender-label-badge {
-    display: inline-block;
-    font-size: 9px;
-    font-weight: 900;
-    padding: 2px 7px;
-    border-radius: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-left: 6px;
-    vertical-align: middle;
-}
-.sender-label-username { background: #1d4ed820; color: #3b82f6; border: 1px solid #3b82f640; }
-.sender-label-code { background: #7c3aed20; color: #a78bfa; border: 1px solid #a78bfa40; }
-
-/* Improved form input focus */
-.form-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
-.adm-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
-
+        .settings-card {
+            background: #111a2e; 
+            padding: 20px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            color: #f1f5f9; 
+            margin-bottom: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
     </style>
 </head>
 <body>
@@ -400,103 +518,105 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
 <div id="loading">
     <div class="light-box">
         <div class="inner-img">
-            <div class="light-box"><div class="inner-img"><img src="https://i.ibb.co.com/N28c49dD/photo-2026-04-01-22-35-52.jpg"></div></div>
+            <img src="https://i.ibb.co.com/N28c49dD/photo-2026-04-01-22-35-52.jpg" alt="Logo">
         </div>
     </div>
     <div class="loading-title">Niva Follower Coin Buy</div>
-    <div class="loading-subtitle">"Best Deal, Premium experience"</div>
+    <div class="loading-subtitle">Best Deal • Premium Experience</div>
 </div>
 
 <div id="user-app-interface" style="display:none;">
     <a href="#" id="help-link" class="help-btn" target="_blank">🎧</a>
     
-	
-	<div class="profile-card">
-    <img src="" id="user-pfp" class="user-avatar">
-    <div style="flex:1; margin-left:12px;">
-        <h3 id="user-display-name" style="margin:0;">User</h3>
-        <p id="user-display-tag" style="margin:0; font-size:12px; opacity:0.8;">@username</p>
-    </div>
-    <div style="background:rgba(255,255,255,0.1); padding:8px 12px; border-radius:15px; text-align:center;">
-        <small style="font-size:8px; font-weight:900; display:block;">SUCCESS</small>
-        <b id="suc-count-display">0</b>
-    </div>
-</div>
-
-<div id="admin-shortcut" style="display:none; margin: 15px 5px;">
-    <button onclick="openAdminPanel()" style="width:100%; padding:16px; background:#2563eb; color:white; border:none; border-radius:20px; font-weight:800; font-size:14px; box-shadow:0 10px 20px rgba(37, 99, 235, 0.2);">
-        🛡️ Access Admin Dashboard
-    </button>
-</div>
-	
-	
-<div id="admin-master-ui">
-    <button onclick="closeAdminPanel()" style="position: fixed; top: 20px; right: 20px; z-index: 100002; background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 10px; font-weight: 800;">CLOSE ✖</button>
-
-    <div id="admin-lock-screen">
-        <div style="text-align: center; background: rgba(255,255,255,0.05); padding: 40px; border-radius: 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
-            <div style="font-size: 50px; margin-bottom: 20px;">🛡️</div>
-            <h2 style="margin-bottom: 10px; font-weight: 800;">Admin Verification</h2>
-            <p style="color: #94a3b8; font-size: 13px; margin-bottom: 25px;">Enter secure PIN to access dashboard</p>
-            
-            <input type="password" id="adm-pin-input" maxlength="4" placeholder="••••" style="width: 150px; background: #1e293b; border: 2px solid #334155; color: white; text-align: center; font-size: 24px; padding: 12px; border-radius: 15px; letter-spacing: 5px; margin-bottom: 20px; outline: none;">
-            
-            <button onclick="verifyAdminPin()" style="display: block; width: 100%; background: #2563eb; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer;">UNLOCK DASHBOARD</button>
+    <div class="profile-card">
+        <img src="" id="user-pfp" class="user-avatar" alt="User avatar">
+        <div style="flex:1; margin-left:14px;">
+            <h3 id="user-display-name" style="margin:0; font-weight: 800; font-size: 18px;">User</h3>
+            <p id="user-display-tag" style="margin:2px 0 0; font-size:13px; opacity:0.8; font-weight:600;">@username</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.12); padding:10px 14px; border-radius:18px; text-align:center; border: 1px solid rgba(255,255,255,0.08);">
+            <small style="font-size:9px; font-weight:900; display:block; letter-spacing: 0.8px;">SUCCESS</small>
+            <b id="suc-count-display" style="font-size: 18px;">0</b>
         </div>
     </div>
 
-    <div id="admin-dashboard-view" style="display: none;">
-        <div class="adm-container">
-            <header style="margin: 30px 0 20px;">
-                <h1 style="font-size: 24px; font-weight: 900; color: #f1f5f9;">Admin Command Center</h1>
-                <p style="color: #94a3b8; font-size: 14px;">Manage orders, market rates and settings.</p>
-            </header>
-
-            <div class="adm-stats-row">
-    <div class="adm-stat-box">
-        <small>Pending Orders</small>
-        <h3 id="adm-total-pending">0</h3>
+    <div id="admin-shortcut" style="display:none; margin: 15px 5px;">
+        <button onclick="openAdminPanel()" style="width:100%; padding:18px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color:white; border:none; border-radius:22px; font-weight:900; font-size:14px; box-shadow:0 10px 20px rgba(37, 99, 235, 0.25); cursor: pointer;">
+            🛡️ Access Admin Dashboard
+        </button>
     </div>
-    <div class="adm-stat-box">
-        <small>Approved</small>
-        <h3 id="adm-total-approved">0</h3>
-    </div>
-    <div class="adm-stat-box">
-        <small>Rejected</small>
-        <h3 id="adm-total-rejected">0</h3>
-    </div>
-</div>
-
-           <div class="adm-tab-menu">
-    <div class="adm-tab active" onclick="switchAdminTab('pending', this)">
-        PENDING (<span id="count-pending-tab">0</span>)
-    </div>
-    <div class="adm-tab" onclick="switchAdminTab('history', this)">HISTORY</div>
-    <div class="adm-tab" onclick="switchAdminTab('settings', this)">SETTINGS</div>
-</div>
-
-            <div id="admin-dynamic-content">
-                </div>
-        </div>
-    </div>
-</div>
     
-</div>
+    <div id="admin-master-ui">
+        <button onclick="closeAdminPanel()" style="position: fixed; top: 20px; right: 20px; z-index: 100002; background: #ef4444; color: white; border: none; padding: 12px 18px; border-radius: 14px; font-weight: 800; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4); cursor: pointer;">CLOSE ✕</button>
 
+        <div id="admin-lock-screen">
+            <div style="text-align: center; background: rgba(21, 31, 50, 0.7); padding: 40px 30px; border-radius: 30px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08); width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+                <div style="font-size: 56px; margin-bottom: 20px;">🛡️</div>
+                <h2 style="margin: 0 0 10px; font-weight: 900; font-size: 24px;">Admin Verification</h2>
+                <p style="color: #8da2c7; font-size: 13px; margin: 0 0 25px; font-weight: 600;">Enter secure PIN to access dashboard</p>
+                
+                <input type="password" id="adm-pin-input" maxlength="4" placeholder="••••" style="width: 160px; background: #080f1d; border: 2px solid #1e2e4a; color: white; text-align: center; font-size: 28px; padding: 12px; border-radius: 18px; letter-spacing: 6px; margin-bottom: 20px; outline: none;">
+                
+                <button onclick="verifyAdminPin()" style="display: block; width: 100%; background: #2563eb; color: white; border: none; padding: 16px; border-radius: 18px; font-weight: 800; cursor: pointer;">UNLOCK DASHBOARD</button>
+            </div>
+        </div>
+
+        <div id="admin-dashboard-view" style="display: none;">
+            <div class="adm-container">
+                <header style="margin: 30px 0 20px;">
+                    <h1 style="font-size: 26px; font-weight: 900; color: #f1f5f9; margin: 0;">Admin Command Center</h1>
+                    <p style="color: #8da2c7; font-size: 14px; margin: 5px 0 0; font-weight: 600;">Manage orders, market rates and settings.</p>
+                </header>
+
+                <div class="adm-stats-row">
+                    <div class="adm-stat-box">
+                        <small>Pending</small>
+                        <h3 id="adm-total-pending">0</h3>
+                    </div>
+                    <div class="adm-stat-box">
+                        <small>Approved</small>
+                        <h3 id="adm-total-approved">0</h3>
+                    </div>
+                    <div class="adm-stat-box">
+                        <small>Rejected</small>
+                        <h3 id="adm-total-rejected">0</h3>
+                    </div>
+                </div>
+
+                <div class="adm-tab-menu">
+                    <div class="adm-tab active" onclick="switchAdminTab('pending', this)">
+                        PENDING (<span id="count-pending-tab">0</span>)
+                    </div>
+                    <div class="adm-tab" onclick="switchAdminTab('history', this)">HISTORY</div>
+                    <div class="adm-tab" onclick="switchAdminTab('settings', this)">SETTINGS</div>
+                </div>
+
+                <div id="admin-dynamic-content"></div>
+            </div>
+        </div>
+    </div>
+    
     <div id="home-scr">
         <a href="#" id="chan-link" target="_blank" class="action-card">
-            <div style="display:flex; align-items:center; gap:12px;">
+            <div style="display:flex; align-items:center; gap:14px;">
                 <div class="icon-box">📢</div>
-                <div><b>Join Channel</b><br><small style="color:#64748b;">Updates & Proofs</small></div>
+                <div>
+                    <b style="font-size: 15px;">Join Channel</b><br>
+                    <small style="color:#8da2c7; font-weight:600;">Updates & proofs</small>
+                </div>
             </div>
             <span>❯</span>
         </a>
-        <div style="font-size:18px; font-weight:800; margin:20px 0 15px 5px;">Coin Market</div>
+        <div style="font-size:18px; font-weight:900; margin:24px 0 16px 5px; letter-spacing: 0.5px;">Coin Market</div>
         <div id="market-list-display"></div>
     </div>
 
-    <div id="history-scr" style="display:none; padding-top:10px;"><div id="history-list-display"></div></div>
-    <div id="rank-scr" style="display:none; padding-top:10px;"><div id="rank-list-display"></div></div>
+    <div id="history-scr" style="display:none; padding-top:10px;">
+        <div id="history-list-display"></div>
+    </div>
+    <div id="rank-scr" style="display:none; padding-top:10px;">
+        <div id="rank-list-display"></div>
+    </div>
 
     <nav class="nav-dock">
         <button class="nav-tab active" onclick="switchTab('home-scr', this)">🏠</button>
@@ -504,71 +624,74 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
     </nav>
 </div>
 
-<div id="order-modal" class="modal-mask">
-    <div class="bottom-sheet">
+<div id="order-modal" class="modal-mask" onclick="if(event.target===this) closeModal()">
+    <div class="bottom-sheet" onclick="event.stopPropagation()">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 id="modal-coin-title" style="margin:0; font-size:22px;">Sell Coin</h2>
-            <button onclick="closeModal()" style="background:none; border:none; font-size:24px; color:#94a3b8;">✕</button>
+            <h2 id="modal-coin-title" style="margin:0; font-size:22px; font-weight:900;">Sell Coin</h2>
+            <button onclick="closeModal()" style="background:none; border:none; font-size:24px; color:#8da2c7; cursor:pointer;">✕</button>
         </div>
-        <div style="background:#fffbeb; border:1px dashed #fcd34d; padding:15px; border-radius:20px; text-align:center; margin-bottom:20px;">
-            <small style="font-weight:800; color:#b45309;">SEND COINS TO THIS ID</small>
-            <div id="display-admin-id" style="font-size:20px; font-weight:900; margin:5px 0; color:#1e293b;">---</div>
-            <button onclick="copyAdminID()" style="background:white; border:1px solid #fcd34d; padding:5px 15px; border-radius:12px; font-size:11px; font-weight:800;">COPY ID</button>
+        
+        <div style="background:rgba(245, 158, 11, 0.08); border:1px dashed rgba(245, 158, 11, 0.4); padding:18px; border-radius:24px; text-align:center; margin-bottom:20px;">
+            <small style="font-weight:900; color:#fbbf24; letter-spacing: 0.8px; display: block; margin-bottom: 5px;">SEND COINS TO THIS ID</small>
+            <div id="display-admin-id" style="font-size:22px; font-weight:900; margin:5px 0; color:#fff;">---</div>
+            <button onclick="copyAdminID()" style="background:white; border:none; padding:6px 16px; border-radius:12px; font-size:11px; font-weight:900; cursor:pointer; color:#0b111e; margin-top: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">COPY ID</button>
         </div>
-        <input type="number" id="input-qty" class="form-input" placeholder="Amount (Min 5000)" oninput="calculatePayout()">
-        <div id="sender-field-label" style="font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; margin-top:4px; padding-left:4px;">Sender Username <span class="sender-label-badge sender-label-username">USERNAME</span></div>
+        
+        <input type="number" id="input-qty" class="form-input" placeholder="Amount" oninput="calculatePayout()">
         <input type="text" id="input-sender" class="form-input" placeholder="SENDER USERNAME">
+        
         <div style="display:grid; grid-template-columns:1fr 1.2fr; gap:12px;">
-            <select id="input-method" class="form-input"></select>
+            <select id="input-method" class="form-input" style="appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'white\' height=\'24\' viewBox=\'0 0 24 24\' width=\'24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 10px center;"></select>
             <input type="text" id="input-number" class="form-input" placeholder="Payment Number">
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 0;">
-            <span style="font-weight:700; color:#64748b;">You Get:</span>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px 0; border-top: 1px dashed rgba(255,255,255,0.08); margin-top: 10px;">
+            <span style="font-weight:800; color:#8da2c7;">You Get:</span>
             <div style="text-align:right;">
-                <small style="color:#ef4444; font-weight:800; display:block;">FEE: -5৳</small>
-                <b id="display-final-payout" style="font-size:28px; color:#22c55e;">0.00 ৳</b>
+                <small style="color:#ef4444; font-weight:900; display:block; margin-bottom: 2px;">FEE: -5৳</small>
+                <b id="display-final-payout" style="font-size:28px; color:#10b981;">0.00 ৳</b>
             </div>
         </div>
         <button class="btn-submit" onclick="showConfirmation()">Next Step →</button>
     </div>
 </div>
 
-<div id="review-modal" class="modal-mask">
-    <div class="bottom-sheet" style="background: #ffffff; border-top: 5px solid #2563eb;">
-        <div style="width: 50px; height: 5px; background: #e2e8f0; border-radius: 10px; margin: 0 auto 20px;"></div>
-        <h2 style="text-align:center; margin-bottom: 5px; font-weight: 900; color: #1e293b;">Review Details</h2>
-        <p style="text-align: center; color: #64748b; font-size: 13px; margin-bottom: 20px;">Please check everything before final submission.</p>
+<div id="review-modal" class="modal-mask" onclick="if(event.target===this) closeReviewModal()">
+    <div class="bottom-sheet" style="background: #111a2e; border-top: 5px solid #2563eb;" onclick="event.stopPropagation()">
+        <div style="width: 50px; height: 5px; background: rgba(255,255,255,0.15); border-radius: 10px; margin: 0 auto 20px;"></div>
+        <h2 style="text-align:center; margin-bottom: 5px; font-weight: 900; color: #fff; font-size: 22px;">Review Details</h2>
+        <p style="text-align: center; color: #8da2c7; font-size: 13px; margin-bottom: 24px; font-weight: 600;">Please check everything before final submission.</p>
         
-        <div style="background: #f1f5f9; border-radius: 25px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                <span style="color: #64748b;">COIN:</span> 
-                <b id="r-coin" style="color:#2563eb; background: #dbeafe; padding: 2px 10px; border-radius: 10px;">---</b>
+        <div style="background: #090f1d; border-radius: 25px; padding: 20px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:14px; align-items: center;">
+                <span style="color: #8da2c7; font-weight: 700; font-size: 14px;">COIN:</span> 
+                <b id="r-coin" style="color:#2563eb; background: rgba(37, 99, 235, 0.15); padding: 4px 12px; border-radius: 10px; font-size: 13px; border: 1px solid rgba(37, 99, 235, 0.25);">---</b>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                <span style="color: #64748b;">Amount:</span> 
-                <b id="r-qty" style="color:#1e293b;">---</b>
+            <div style="display:flex; justify-content:space-between; margin-bottom:14px;">
+                <span style="color: #8da2c7; font-weight: 700; font-size: 14px;">Amount:</span> 
+                <b id="r-qty" style="color:#fff;">---</b>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                <span style="color: #64748b;" id="r-sender-label">Sender:</span> 
-                <b id="r-sender" style="color:#1e293b;">---</b>
+            <div style="display:flex; justify-content:space-between; margin-bottom:14px;">
+                <span style="color: #8da2c7; font-weight: 700; font-size: 14px;" id="r-sender-label">Sender:</span> 
+                <b id="r-sender" style="color:#fff;">---</b>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                <span style="color: #64748b;">Method:</span> 
+            <div style="display:flex; justify-content:space-between; margin-bottom:14px;">
+                <span style="color: #8da2c7; font-weight: 700; font-size: 14px;">Method:</span> 
                 <b id="r-method" style="color:#2563eb;">---</b>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                <span style="color: #64748b;">Account No:</span> 
-                <b id="r-number" style="color:#1e293b;">---</b>
+            <div style="display:flex; justify-content:space-between; margin-bottom:14px;">
+                <span style="color: #8da2c7; font-weight: 700; font-size: 14px;">Account No:</span> 
+                <b id="r-number" style="color:#fff;">---</b>
             </div>
-            <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 15px 0;">
+            <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.08); margin: 18px 0;">
             <div style="display:flex; justify-content:space-between; align-items: center;">
-                <span style="font-weight: 800; color: #1e293b;">You Will Get:</span> 
-                <b id="r-pay" style="color:#10b981; font-size:22px; font-weight: 900;">0.00৳</b>
+                <span style="font-weight: 800; color: #fff; font-size: 15px;">You Will Get:</span> 
+                <b id="r-pay" style="color:#10b981; font-size:24px; font-weight: 900;">0.00৳</b>
             </div>
         </div>
 
-        <button class="btn-submit" onclick="finalSubmitOrder(this)" style="background: linear-gradient(135deg, #2563eb, #7c3aed); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);">Confirm & Submit ✅</button>
-        <button onclick="closeReviewModal()" style="width:100%; border:none; background:none; margin-top:15px; color:#94a3b8; font-weight:700; font-size: 14px;">Go Back & Edit</button>
+        <button class="btn-submit" onclick="finalSubmitOrder(this)" style="background: linear-gradient(135deg, #2563eb, #10b981); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);">Confirm & Submit ✅</button>
+        <button onclick="closeReviewModal()" style="width:100%; border:none; background:none; margin-top:15px; color:#8da2c7; font-weight:700; font-size: 14px; cursor: pointer;">Go Back & Edit</button>
     </div>
 </div>
 
@@ -601,6 +724,8 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
     let adminActiveTab = 'pending';
     let tutorialUploadInProgress = false;
     let currentTutorialData = null;
+    let currentSenderInputType = 'username';
+    let currentSenderInputLabel = 'Username';
 
     function safeHaptic(type, level) {
         try {
@@ -622,6 +747,15 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
     function normalizeAdminMinQty(value) {
         const n = parseInt(value, 10);
         return Number.isFinite(n) && n > 0 ? n : 100000;
+    }
+
+    function normalizeSenderInputType(value) {
+        const normalized = String(value || 'username').trim().toLowerCase();
+        return normalized === 'code' ? 'code' : 'username';
+    }
+
+    function getSenderInputLabel(value) {
+        return normalizeSenderInputType(value) === 'code' ? 'Code' : 'Username';
     }
 
     function formatMoney(value) {
@@ -656,7 +790,7 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
         if (userNameEl) userNameEl.innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
         if (userTagEl) userTagEl.innerText = '@' + (user.username || 'guest');
         if (userPfpEl) {
-            userPfpEl.src = user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name || 'Guest')}&background=3b82f6&color=fff&bold=true`;
+            userPfpEl.src = user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.first_name || 'Guest')}&background=2563eb&color=fff&bold=true`;
         }
 
         const adminBtn = document.getElementById('admin-shortcut');
@@ -691,8 +825,11 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
                 const on = v.status !== false;
                 const submitLimit = normalizeSubmitLimit(v.submitLimit);
                 const adminMinQty = normalizeAdminMinQty(v.adminMinQty);
+                const senderInputType = normalizeSenderInputType(v.senderInputType);
+                const senderInputLabel = getSenderInputLabel(senderInputType);
+                
                 html += `<div class="coin-card ${on ? '' : 'offline'}"
-                    ${on ? `data-coin="${escapeHtml(c.key)}" data-user-rate="${Number(v.userRate || 0)}" data-admin-rate="${Number(v.adminRate || 0)}" data-transfer-id="${escapeHtml(v.transferId || '')}" data-submit-limit="${submitLimit}" data-admin-min="${adminMinQty}" data-sender-type="${escapeHtml(v.senderType || 'username')}" onclick="handleCoinCardClick(this)"` : ''}>
+                    ${on ? `data-coin="${escapeHtml(c.key)}" data-user-rate="${Number(v.userRate || 0)}" data-admin-rate="${Number(v.adminRate || 0)}" data-transfer-id="${escapeHtml(v.transferId || '')}" data-submit-limit="${submitLimit}" data-admin-min="${adminMinQty}" data-sender-input-type="${senderInputType}" onclick="handleCoinCardClick(this)"` : ''}>
                     <div class="status-badge ${on ? 'status-online' : 'status-offline'}">${on ? '● Online' : '● Offline'}</div>
                     <div style="display:flex; align-items:center; gap:15px;">
                         <div class="icon-box">🪙</div>
@@ -702,6 +839,7 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
                         <div class="rate-box"><small>User Rate</small><div class="rate-val">${Number(v.userRate || 0)}৳</div></div>
                         <div class="rate-box"><small>Admin Rate</small><div class="rate-val">${Number(v.adminRate || 0)}৳</div></div>
                     </div>
+                    ${on ? `<div class="click-here-text">Requires: ${senderInputLabel} • Limit: ${submitLimit.toLocaleString()} • Click to Sell</div>` : ''}
                 </div>`;
             });
             const market = document.getElementById('market-list-display');
@@ -736,41 +874,33 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
             card.dataset.transferId || '',
             normalizeSubmitLimit(card.dataset.submitLimit),
             normalizeAdminMinQty(card.dataset.adminMin),
-            card.dataset.senderType || 'username'
+            card.dataset.senderInputType || 'username'
         );
     }
 
-    let currentCoinSenderType = 'username';
-
-    function openOrderModal(name, userRate, adminRate, tid, submitLimit, adminMinQty, senderType) {
+    function openOrderModal(name, userRate, adminRate, tid, submitLimit, adminMinQty, senderInputType = 'username') {
         currentSelectedCoin = name;
         currentCoinRate = parseFloat(userRate || 0);
         currentCoinAdminRate = parseFloat(adminRate || 0);
         currentCoinTID = tid;
         currentCoinSubmitLimit = normalizeSubmitLimit(submitLimit);
         currentCoinAdminMinQty = normalizeAdminMinQty(adminMinQty);
+        currentSenderInputType = normalizeSenderInputType(senderInputType);
+        currentSenderInputLabel = getSenderInputLabel(currentSenderInputType);
         currentAppliedRate = currentCoinRate;
         calculatedFinalPayout = 0;
-        currentCoinSenderType = senderType || 'username';
 
         document.getElementById('modal-coin-title').innerText = 'Sell ' + name;
         document.getElementById('display-admin-id').innerText = tid || '---';
         document.getElementById('input-qty').value = '';
-        document.getElementById('input-sender').value = '';
+        document.getElementById('input-qty').placeholder = `Amount (Min ${currentCoinSubmitLimit.toLocaleString()})`;
+        
+        const senderField = document.getElementById('input-sender');
+        senderField.value = '';
+        senderField.placeholder = `Sender ${currentSenderInputLabel.toUpperCase()}`;
+        
         document.getElementById('input-number').value = '';
-        document.getElementById('input-qty').placeholder = `Amount (Min ${currentCoinSubmitLimit})`;
         document.getElementById('display-final-payout').innerText = '0.00 ৳';
-
-        // Update sender input based on senderType
-        const senderInput = document.getElementById('input-sender');
-        const senderLabel = document.getElementById('sender-field-label');
-        if (currentCoinSenderType === 'code') {
-            senderInput.placeholder = 'SENDER CODE';
-            if (senderLabel) senderLabel.innerHTML = 'Sender Code <span class="sender-label-badge sender-label-code">CODE</span>';
-        } else {
-            senderInput.placeholder = 'SENDER USERNAME';
-            if (senderLabel) senderLabel.innerHTML = 'Sender Username <span class="sender-label-badge sender-label-username">USERNAME</span>';
-        }
 
         const orderModal = document.getElementById('order-modal');
         orderModal.style.display = 'flex';
@@ -806,19 +936,19 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
         calculatePayout();
 
         if (qty < currentCoinSubmitLimit || !sender || !num) {
-            return notify(`Fill all details! (Min ${currentCoinSubmitLimit})`);
+            return notify(`Fill all details correctly! (Min ${currentCoinSubmitLimit.toLocaleString()})`);
         }
 
         document.getElementById('r-coin').innerText = currentSelectedCoin;
-        document.getElementById('r-qty').innerText = qty;
+        document.getElementById('r-qty').innerText = qty.toLocaleString();
+        
+        const rLabel = document.getElementById('r-sender-label');
+        if (rLabel) rLabel.innerText = `Sender ${currentSenderInputLabel}:`;
+        
         document.getElementById('r-sender').innerText = sender;
         document.getElementById('r-method').innerText = method;
         document.getElementById('r-number').innerText = num;
         document.getElementById('r-pay').innerText = calculatedFinalPayout + ' ৳';
-
-        // Update review label for sender
-        const rSenderLabel = document.getElementById('r-sender-label');
-        if (rSenderLabel) rSenderLabel.innerText = currentCoinSenderType === 'code' ? 'Sender Code:' : 'Sender Username:';
 
         closeModal();
         const rm = document.getElementById('review-modal');
@@ -852,10 +982,11 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
             ownerUid: String(user.id || ''),
             photo: user.photo_url || '',
             coin: currentSelectedCoin,
-            amt: parseFloat(document.getElementById('r-qty').innerText) || 0,
+            amt: parseFloat(document.getElementById('input-qty').value) || 0,
             payable: parseFloat(calculatedFinalPayout) || 0,
             sender: document.getElementById('r-sender').innerText,
-            senderType: currentCoinSenderType || 'username',
+            senderInputType: currentSenderInputType,
+            senderLabel: currentSenderInputLabel,
             number: document.getElementById('r-number').innerText,
             method: document.getElementById('r-method').innerText,
             status: 'pending',
@@ -891,15 +1022,15 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
                 const color = d.status === 'pending' ? '#f39c12' : (d.status === 'completed' ? '#2ecc71' : '#e74c3c');
                 h += `<div class="action-card" style="flex-direction:column; align-items:flex-start; gap:8px; margin-bottom:10px;">
                         <div style="display:flex; justify-content:space-between; width:100%;">
-                            <b>${escapeHtml(d.amt)} ${escapeHtml(d.coin)}</b>
-                            <span style="color:${color}; font-weight:900;">${escapeHtml(String(d.status || '').toUpperCase())}</span>
+                            <b style="font-size: 15px;">${escapeHtml(d.amt)} ${escapeHtml(d.coin)}</b>
+                            <span style="color:${color}; font-weight:900; font-size: 13px;">${escapeHtml(String(d.status || '').toUpperCase())}</span>
                         </div>
-                        <small style="color:#64748b;">Payable: ${formatMoney(d.payable)} | To: ${escapeHtml(d.targetId || '---')}</small>
+                        <small style="color:#8da2c7; font-weight:600;">Payable: ${formatMoney(d.payable)} | To: ${escapeHtml(d.targetId || '---')}</small>
                     </div>`;
             });
 
             const historyContainer = document.getElementById('history-list-display');
-            if (historyContainer) historyContainer.innerHTML = h || "<center style='padding:20px; color:#94a3b8;'>No History Found</center>";
+            if (historyContainer) historyContainer.innerHTML = h || "<center style='padding:40px; color:#8da2c7; font-weight: 600;'>No History Found</center>";
             const countDisplay = document.getElementById('suc-count-display');
             if (countDisplay) countDisplay.innerText = count;
         });
@@ -918,17 +1049,17 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
 
             users.sort((a, b) => (parseFloat(b.totalAmount) || 0) - (parseFloat(a.totalAmount) || 0));
             const top10 = users.slice(0, 10);
-            let html = "<h3 style='margin: 15px 5px;'>🏆 Top 10 Sellers</h3>";
+            let html = "<h3 style='margin: 15px 5px; font-weight: 800;'>🏆 Top Sellers</h3>";
 
             if (top10.length === 0) {
-                html += "<p style='text-align:center; padding:20px; color:#ff0303;'>No earners yet.</p>";
+                html += "<p style='text-align:center; padding:30px; color:#ef4444; font-weight:600;'>No earners yet.</p>";
             } else {
                 top10.forEach((d, i) => {
                     const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`;
                     html += `<div class="action-card" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                         <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="font-weight:900; color:#0223f7; width:25px; font-size:14px;">${medal}</div>
-                            <b style="font-size:14px; color:#0061ff;">@${escapeHtml(d.user)}</b>
+                            <div style="font-weight:900; color:#2563eb; width:25px; font-size:14px;">${medal}</div>
+                            <b style="font-size:14px; color:#fff;">@${escapeHtml(d.user)}</b>
                         </div>
                         <b style="color:#10b981; font-size:15px;">${formatMoney(d.totalAmount)}</b>
                     </div>`;
@@ -1042,69 +1173,82 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
                 if (!shouldShow) return;
                 const status = String(o.status || 'pending');
                 const statusColor = status === 'pending' ? '#f59e0b' : (status === 'completed' ? '#10b981' : '#ef4444');
+                const senderLabel = o.senderLabel || getSenderInputLabel(o.senderInputType);
+                
                 html += `
-                <div class="adm-order-box" style="border-left:5px solid ${statusColor}; padding:12px; margin-bottom:12px; border-radius:15px; background:#1e293b; box-shadow:0 4px 12px rgba(0,0,0,0.2); border-top:1px solid #334155; border-right:1px solid #334155; border-bottom:1px solid #334155;">
-                    <div class="order-header" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                <div class="adm-order-box" style="border-left:5px solid ${statusColor};">
+                    <div class="order-header">
                         <div>
-                            <b style="font-size:14px; color:#f1f5f9;">@${escapeHtml(getOrderOwnerLabel(o))}</b><br>
-                            <small style="color:#94a3b8; font-size:11px;">${o.senderType === 'code' ? '🔑' : '👤'} ${escapeHtml(o.sender || '---')} <span style="font-size:9px; padding:1px 5px; border-radius:5px; ${o.senderType === 'code' ? 'background:#7c3aed20;color:#a78bfa;' : 'background:#1d4ed820;color:#3b82f6;'}">${o.senderType === 'code' ? 'CODE' : 'USERNAME'}</span></small>
+                            <b style="font-size:15px; color:#f1f5f9;">@${escapeHtml(getOrderOwnerLabel(o))}</b><br>
+                            <small style="color:#8da2c7; font-size:11px; font-weight:600;">${escapeHtml(senderLabel)}: ${escapeHtml(o.sender || '---')}</small>
                         </div>
-                        <span class="status-badge" style="position:static; background:${statusColor}20; color:${statusColor}; font-size:10px; padding:4px 8px; border-radius:8px; font-weight:800;">${escapeHtml(status.toUpperCase())}</span>
+                        <span class="status-badge" style="background:${statusColor}20; color:${statusColor}; border:1.5px solid ${statusColor}30;">${escapeHtml(status.toUpperCase())}</span>
                     </div>
 
-                    <div class="order-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; margin-bottom:10px;">
-                        <div class="grid-item" style="background:#0f172a; padding:6px; border-radius:8px; border:1px solid #334155;">
-                            <small style="font-size:9px; color:#94a3b8; font-weight:700;">COIN</small>
-                            <b style="display:block; font-size:12px; color:#f1f5f9;">${escapeHtml(o.coin || '---')}</b>
+                    <div class="order-grid" style="margin-bottom:12px;">
+                        <div class="grid-item">
+                            <small>COIN</small>
+                            <b>${escapeHtml(o.coin || '---')}</b>
                         </div>
-                        <div class="grid-item" style="background:#0f172a; padding:6px; border-radius:8px; border:1px solid #334155;">
-                            <small style="font-size:9px; color:#94a3b8; font-weight:700;">METHOD</small>
-                            <b style="display:block; font-size:12px; color:#f1f5f9;">${escapeHtml(o.method || '---')}</b>
+                        <div class="grid-item">
+                            <small>METHOD</small>
+                            <b>${escapeHtml(o.method || '---')}</b>
                         </div>
-                        <div class="grid-item" style="background:#0f172a; padding:6px; border-radius:8px; border:1px solid #334155;">
-                            <small style="font-size:9px; color:#94a3b8; font-weight:700;">ASSET</small>
-                            <b style="display:block; font-size:12px; color:#f1f5f9;">${escapeHtml(o.amt || '---')}</b>
+                        <div class="grid-item">
+                            <small>ASSET</small>
+                            <b>${escapeHtml(o.amt || '---')}</b>
                         </div>
-                        <div class="grid-item" style="background:#064e3b; padding:6px; border-radius:8px; border:1px solid #065f46;">
-                            <small style="font-size:9px; color:#6ee7b7; font-weight:700;">PAYOUT</small>
-                            <b style="display:block; font-size:12px; color:#10b981;">${formatMoney(o.payable)}</b>
+                        <div class="grid-item" style="background:rgba(16,185,129,0.06); border-color:rgba(16,185,129,0.15);">
+                            <small style="color:#10b981;">PAYOUT</small>
+                            <b style="color:#10b981;">${formatMoney(o.payable)}</b>
                         </div>
                     </div>
 
-                    <div onclick="copyToClipboard('${String(o.number || '').replace(/'/g, "\\'")}')" style="padding:8px; background:#334155; border-radius:10px; border:1px dashed #475569; cursor:pointer; margin-bottom:8px;">
-                        <small style="color:#94a3b8; display:block; font-size:9px; font-weight:800; text-transform:uppercase;">Tap to copy</small>
+                    <div onclick="copyToClipboard('${String(o.number || '').replace(/'/g, "\\'")}')" style="padding:12px; background:#080f1d; border-radius:14px; border:1px dashed rgba(255,255,255,0.08); cursor:pointer; margin-bottom:10px;">
+                        <small style="color:#8da2c7; display:block; font-size:9px; font-weight:800; text-transform:uppercase; margin-bottom:3px; letter-spacing:0.5px;">Tap to copy payout number</small>
                         <b style="color:#60a5fa; font-size:13px;">📱 ${escapeHtml(o.number || '---')}</b>
                     </div>
 
-                    <div style="padding-left:4px; margin-bottom:10px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-                        <small style="color:#94a3b8; font-size:9px; font-weight:700;">TARGET: ${escapeHtml(o.targetId || '---')}</small>
-                        <small style="color:#94a3b8; font-size:9px; font-weight:700;">RATE: ${parseFloat(o.appliedRate || 0)}৳</small>
+                    <div onclick="copyToClipboard('${String(o.sender || '').replace(/'/g, "\\'")}')" style="padding:12px; background:#080f1d; border-radius:14px; border:1px dashed rgba(255,255,255,0.08); cursor:pointer; margin-bottom:10px;">
+                        <small style="color:#8da2c7; display:block; font-size:9px; font-weight:800; text-transform:uppercase; margin-bottom:3px; letter-spacing:0.5px;">Tap to copy ${escapeHtml(senderLabel)}</small>
+                        <b style="color:#a78bfa; font-size:13px;">🆔 ${escapeHtml(o.sender || '---')}</b>
                     </div>
 
-                    <div style="display:flex; gap:8px;">
+                    <div style="padding-left:4px; margin-bottom:14px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                        <small style="color:#8da2c7; font-size:10px; font-weight:700;">TARGET: ${escapeHtml(o.targetId || '---')}</small>
+                        <small style="color:#8da2c7; font-size:10px; font-weight:700;">RATE: ${parseFloat(o.appliedRate || 0)}৳</small>
+                    </div>
+
+                    <div style="display:flex; gap:10px;">
                         ${status === 'pending' ? `
-                            <button onclick="updateOrderStatus('${o.id}','completed','${String(getOrderOwnerLabel(o)).replace(/'/g, "\\'")}',${parseFloat(o.payable || 0)})" style="flex:2; background:#10b981; color:white; border:none; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">APPROVE</button>
-                            <button onclick="updateOrderStatus('${o.id}','rejected')" style="flex:1; background:#450a0a; color:#f87171; border:1px solid #7f1d1d; padding:10px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">REJECT</button>` : ''}
-                        <button onclick="deleteOrder('${o.id}')" style="background:none; border:1px solid #ef4444; color:#ef4444; padding:10px 12px; border-radius:10px; font-size:14px; cursor:pointer;">🗑️</button>
+                            <button onclick="updateOrderStatus('${o.id}','completed','${String(getOrderOwnerLabel(o)).replace(/'/g, "\\'")}',${parseFloat(o.payable || 0)})" style="flex:2; background:#10b981; color:white; border:none; padding:12px; border-radius:12px; font-size:13px; font-weight:800; cursor:pointer;">APPROVE</button>
+                            <button onclick="updateOrderStatus('${o.id}','rejected')" style="flex:1; background:#450a0a; color:#f87171; border:1px solid #7f1d1d; padding:12px; border-radius:12px; font-size:13px; font-weight:800; cursor:pointer;">REJECT</button>` : ''}
+                        <button onclick="deleteOrder('${o.id}')" style="background:none; border:1px solid #ef4444; color:#ef4444; padding:12px; border-radius:12px; font-size:14px; cursor:pointer;">🗑️</button>
                     </div>
                 </div>`;
             });
 
-            area.innerHTML = html || "<center style='padding:30px; color:#64748b;'>No records found.</center>";
+            area.innerHTML = html || "<center style='padding:40px; color:#8da2c7; font-weight:600;'>No records found.</center>";
         });
     }
 
     function renderSettingsUI(container) {
         container.innerHTML = `
-        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+        <div class="settings-card">
             <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">💎 Market Rates & Config</h4>
             <div id="adm-market-config-list">Loading market data...</div>
         </div>
 
-        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+        <div class="settings-card">
             <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">➕ Add New Coin</h4>
             <input type="text" id="new-c-name" class="adm-input" placeholder="Coin Name">
             <input type="text" id="new-c-tid" class="adm-input" placeholder="Address / UID">
+            
+            <select id="new-c-sender-type" class="adm-input">
+                <option value="username">Sell form will require Sender Username</option>
+                <option value="code">Sell form will require Sender Code</option>
+            </select>
+            
             <div class="admin-grid-2">
                 <input type="number" id="new-c-user" class="adm-input" placeholder="User Rate">
                 <input type="number" id="new-c-admin" class="adm-input" placeholder="Admin Rate">
@@ -1113,51 +1257,44 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
                 <input type="number" id="new-c-limit" class="adm-input" placeholder="Submit Limit">
                 <input type="number" id="new-c-admin-min" class="adm-input" placeholder="Admin Rate From Qty">
             </div>
-            <div style="margin-bottom:10px;">
-                <small style="font-size:9px; color:#94a3b8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Sender Field Type</small>
-                <div class="sender-type-toggle" style="margin-top:6px;">
-                    <div id="new-c-sender-username" class="sender-type-btn active-username" onclick="selectNewCoinSenderType('username')">👤 Username</div>
-                    <div id="new-c-sender-code" class="sender-type-btn" onclick="selectNewCoinSenderType('code')">🔑 Code</div>
-                </div>
-            </div>
             <button onclick="addNewCoin()" class="adm-btn" style="background:#10b981; color:white;">ADD COIN</button>
         </div>
 
-        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+        <div class="settings-card">
             <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">💳 Payment Methods</h4>
             <div id="adm-payment-list"></div>
-            <div style="display:flex; gap:8px; margin-top:10px;">
+            <div style="display:flex; gap:8px; margin-top:14px;">
                 <input type="text" id="new-pay-name" class="adm-input" placeholder="New Method" style="margin:0;">
-                <button onclick="addNewPayment()" class="adm-btn" style="width:90px; background:#3b82f6; color:white;">ADD</button>
+                <button onclick="addNewPayment()" class="adm-btn" style="width:100px; background:#2563eb; color:white;">ADD</button>
             </div>
         </div>
 
-        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+        <div class="settings-card">
             <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">🔗 Social Links</h4>
             <input type="text" id="adm-link-chan" class="adm-input" placeholder="Channel Link">
             <input type="text" id="adm-link-help" class="adm-input" placeholder="Support Link">
             <button onclick="updateAdmLinks()" class="adm-btn" style="background:#2563eb; color:white;">UPDATE LINKS</button>
         </div>
 
-        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+        <div class="settings-card">
             <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">🎥 Tutorial Video</h4>
             <input type="text" id="adm-tutorial-title" class="adm-input" placeholder="Tutorial Title">
             <input type="file" id="adm-tutorial-file" class="adm-input" accept="video/*" onchange="handleTutorialFileSelected(event)">
             <input type="text" id="adm-tutorial-url" class="adm-input" placeholder="Paste YouTube link or uploaded video URL">
             <div id="adm-tutorial-upload-note" class="admin-small-note">Choose a video and upload it, or paste a YouTube link and save.</div>
-            <div class="admin-grid-2" style="margin-top:10px;">
+            <div class="admin-grid-2" style="margin-top:12px;">
                 <button onclick="uploadTutorialVideoFile()" class="adm-btn" style="background:#10b981; color:white;">UPLOAD VIDEO</button>
                 <button onclick="updateTutorialVideo()" class="adm-btn" style="background:#2563eb; color:white;">SAVE LINK</button>
             </div>
             <button onclick="removeTutorialVideo()" class="adm-btn" style="background:#ef4444; color:white; margin-top:10px;">REMOVE TUTORIAL</button>
         </div>
 
-        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+        <div class="settings-card">
             <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">🏆 Leaderboard</h4>
-            <div id="adm-leaderboard-list" style="background:#0f172a; border-radius:12px; padding:10px; max-height:220px; overflow-y:auto; border:1px solid #334155;"></div>
+            <div id="adm-leaderboard-list" style="background:#080f1d; border-radius:16px; padding:10px; max-height:240px; overflow-y:auto; border:1px solid rgba(255,255,255,0.06);"></div>
         </div>
 
-        <div class="settings-card" style="background:#1e293b; padding:15px; border-radius:20px; border:1px solid #334155; color:#f1f5f9; margin-bottom:12px;">
+        <div class="settings-card">
             <h4 style="margin-top:0; margin-bottom:15px; color:#fff;">⚠️ Sales Stats</h4>
             <button onclick="resetSalesStats()" class="adm-btn" style="background:#ef4444; color:white;">RESET SALES STATS</button>
         </div>`;
@@ -1169,13 +1306,13 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
             let h = '';
             s.forEach(u => {
                 const d = u.val() || {};
-                h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #334155; gap:12px;">
+                h += `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px 6px; border-bottom:1px solid rgba(255,255,255,0.05); gap:12px;">
                     <div><b style="color:#f1f5f9">@${escapeHtml(d.user || 'unknown')}</b><br><small style="color:#10b981; font-weight:bold;">${formatMoney(d.totalAmount)}</small></div>
                     <button style="border:none; color:#ef4444; background:none; font-weight:800; cursor:pointer;" onclick="deleteLeaderboardUser('${String(d.user || '').replace(/'/g, "\\'")}')">DEL</button>
                 </div>`;
             });
             const lbArea = document.getElementById('adm-leaderboard-list');
-            if (lbArea) lbArea.innerHTML = h || "<center style='color:#64748b; padding:10px;'>No Users</center>";
+            if (lbArea) lbArea.innerHTML = h || "<center style='color:#8da2c7; padding:14px; font-weight:600;'>No Users</center>";
         });
 
         db.ref('marketConfig').on('value', snap => {
@@ -1183,46 +1320,41 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
             snap.forEach(c => {
                 const v = c.val() || {};
                 html += `
-                <div style="background:#1e293b; border:1px solid #334155; border-radius:15px; padding:12px; margin-bottom:10px;">
+                <div style="background:#080f1d; border:1px solid rgba(255,255,255,0.06); border-radius:18px; padding:16px; margin-bottom:14px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-                        <b style="color:#fff;">💎 ${escapeHtml(c.key)}</b>
+                        <b style="color:#fff; font-size:15px;">💎 ${escapeHtml(c.key)}</b>
                         <label class="adm-switch"><input type="checkbox" ${v.status !== false ? 'checked' : ''} onchange="db.ref('marketConfig/${c.key}').update({status:this.checked})"><span class="adm-slider"></span></label>
                     </div>
-                    <input type="text" class="adm-input" value="${escapeHtml(v.transferId || '')}" onchange="db.ref('marketConfig/${c.key}').update({transferId: this.value})" style="margin-top:8px; background:#0f172a; border-color:#334155;">
+                    
+                    <input type="text" class="adm-input" value="${escapeHtml(v.transferId || '')}" onchange="db.ref('marketConfig/${c.key}').update({transferId: this.value})" style="margin-top:12px; background:#111a2e; border-color:rgba(255,255,255,0.08);" placeholder="Target Wallet / UID">
+                    
+                    <select class="adm-input" onchange="db.ref('marketConfig/${c.key}').update({senderInputType:this.value})" style="background:#111a2e; border-color:rgba(255,255,255,0.08); margin-bottom:12px;">
+                        <option value="username" ${normalizeSenderInputType(v.senderInputType) === 'username' ? 'selected' : ''}>Sell form asks Sender Username</option>
+                        <option value="code" ${normalizeSenderInputType(v.senderInputType) === 'code' ? 'selected' : ''}>Sell form asks Sender Code</option>
+                    </select>
+
                     <div class="admin-grid-2">
-                        <div style="background:#0f172a; padding:8px; border-radius:8px; text-align:center; border:1px solid #334155;"><small style="font-size:8px; color:#94a3b8;">USER</small><br><input type="number" value="${Number(v.userRate || 0)}" onchange="db.ref('marketConfig/${c.key}').update({userRate: parseFloat(this.value || 0)})" style="width:100%; border:none; background:transparent; font-weight:800; text-align:center; color:#fff;"></div>
-                        <div style="background:#0f172a; padding:8px; border-radius:8px; text-align:center; border:1px solid #334155;"><small style="font-size:8px; color:#94a3b8;">ADMIN</small><br><input type="number" value="${Number(v.adminRate || 0)}" onchange="db.ref('marketConfig/${c.key}').update({adminRate: parseFloat(this.value || 0)})" style="width:100%; border:none; background:transparent; font-weight:800; text-align:center; color:#fff;"></div>
+                        <div style="background:#111a2e; padding:8px; border-radius:12px; text-align:center; border:1px solid rgba(255,255,255,0.08);"><small style="font-size:9px; color:#8da2c7; font-weight:800;">USER RATE</small><br><input type="number" value="${Number(v.userRate || 0)}" onchange="db.ref('marketConfig/${c.key}').update({userRate: parseFloat(this.value || 0)})" style="width:100%; border:none; background:transparent; font-weight:800; text-align:center; color:#fff; outline:none; font-size:14px; margin-top:2px;"></div>
+                        <div style="background:#111a2e; padding:8px; border-radius:12px; text-align:center; border:1px solid rgba(255,255,255,0.08);"><small style="font-size:9px; color:#8da2c7; font-weight:800;">ADMIN RATE</small><br><input type="number" value="${Number(v.adminRate || 0)}" onchange="db.ref('marketConfig/${c.key}').update({adminRate: parseFloat(this.value || 0)})" style="width:100%; border:none; background:transparent; font-weight:800; text-align:center; color:#fff; outline:none; font-size:14px; margin-top:2px;"></div>
                     </div>
-                    <div class="admin-grid-2">
-                        <input type="number" class="adm-input" value="${normalizeSubmitLimit(v.submitLimit)}" onchange="db.ref('marketConfig/${c.key}').update({submitLimit: normalizeSubmitLimit(this.value)})" placeholder="Submit Limit">
-                        <input type="number" class="adm-input" value="${normalizeAdminMinQty(v.adminMinQty)}" onchange="db.ref('marketConfig/${c.key}').update({adminMinQty: normalizeAdminMinQty(this.value)})" placeholder="Admin Rate From Qty">
+                    
+                    <div class="admin-grid-2" style="margin-top:10px;">
+                        <input type="number" class="adm-input" value="${normalizeSubmitLimit(v.submitLimit)}" onchange="db.ref('marketConfig/${c.key}').update({submitLimit: normalizeSubmitLimit(this.value)})" placeholder="Submit Limit" style="background:#111a2e; border-color:rgba(255,255,255,0.08);">
+                        <input type="number" class="adm-input" value="${normalizeAdminMinQty(v.adminMinQty)}" onchange="db.ref('marketConfig/${c.key}').update({adminMinQty: normalizeAdminMinQty(this.value)})" placeholder="Admin Rate From Qty" style="background:#111a2e; border-color:rgba(255,255,255,0.08);">
                     </div>
-                    <div style="margin-top:8px; margin-bottom:4px;">
-                        <small style="font-size:9px; color:#94a3b8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Sender Field Type</small>
-                        <div class="sender-type-toggle">
-                            <div class="sender-type-btn ${(v.senderType || 'username') === 'username' ? 'active-username' : ''}" 
-                                onclick="setSenderType('${String(c.key).replace(/'/g, "\\'")}', 'username', this)">
-                                👤 Username
-                            </div>
-                            <div class="sender-type-btn ${v.senderType === 'code' ? 'active-code' : ''}"
-                                onclick="setSenderType('${String(c.key).replace(/'/g, "\\'")}', 'code', this)">
-                                🔑 Code
-                            </div>
-                        </div>
-                    </div>
-                    <button class="adm-btn" style="color:#f87171; background:none; font-size:11px; margin-top:5px; font-weight:bold; border:1px solid #7f1d1d;" onclick="removeCoin('${String(c.key).replace(/'/g, "\\'")}')">REMOVE COIN</button>
+                    <button class="adm-btn" style="color:#f87171; background:none; font-size:11px; margin-top:5px; font-weight:bold; border:1px solid #7f1d1d; box-shadow:none;" onclick="removeCoin('${String(c.key).replace(/'/g, "\\'")}')">REMOVE COIN</button>
                 </div>`;
             });
             const mcArea = document.getElementById('adm-market-config-list');
-            if (mcArea) mcArea.innerHTML = html || "<center style='color:#64748b; padding:10px;'>No coins found</center>";
+            if (mcArea) mcArea.innerHTML = html || "<center style='color:#8da2c7; padding:14px; font-weight:600;'>No coins configured.</center>";
         });
 
         db.ref('paymentMethods').on('value', s => {
             let h = '';
             s.forEach(p => {
                 const pv = p.val() || {};
-                h += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #334155; align-items:center; color:#f1f5f9; gap:12px;">
-                    <span>${escapeHtml(p.key)}</span>
+                h += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); align-items:center; color:#f1f5f9; gap:12px;">
+                    <span style="font-weight:600;">${escapeHtml(p.key)}</span>
                     <div style="display:flex; gap:12px; align-items:center;">
                         <label class="adm-switch"><input type="checkbox" ${pv.status !== false ? 'checked' : ''} onchange="db.ref('paymentMethods/${p.key}').update({status:this.checked})"><span class="adm-slider"></span></label>
                         <button style="border:none; color:#ef4444; background:none; cursor:pointer; font-size:16px;" onclick="removePayment('${String(p.key).replace(/'/g, "\\'")}')">🗑️</button>
@@ -1230,7 +1362,7 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
                 </div>`;
             });
             const pmArea = document.getElementById('adm-payment-list');
-            if (pmArea) pmArea.innerHTML = h || "<center style='color:#64748b; padding:10px;'>No methods found</center>";
+            if (pmArea) pmArea.innerHTML = h || "<center style='color:#8da2c7; padding:14px; font-weight:600;'>No payment methods found</center>";
         });
 
         db.ref('settings/links').once('value').then(s => {
@@ -1253,30 +1385,6 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
         });
     }
 
-    let newCoinSenderType = 'username';
-
-    function selectNewCoinSenderType(type) {
-        newCoinSenderType = type;
-        const btnUsername = document.getElementById('new-c-sender-username');
-        const btnCode = document.getElementById('new-c-sender-code');
-        if (btnUsername) { btnUsername.className = 'sender-type-btn' + (type === 'username' ? ' active-username' : ''); }
-        if (btnCode) { btnCode.className = 'sender-type-btn' + (type === 'code' ? ' active-code' : ''); }
-    }
-
-    function setSenderType(coinKey, type, el) {
-        db.ref('marketConfig/' + coinKey).update({ senderType: type }).then(() => {
-            // Update button styles in the parent toggle
-            const toggle = el.closest('.sender-type-toggle');
-            if (toggle) {
-                toggle.querySelectorAll('.sender-type-btn').forEach(btn => {
-                    btn.className = 'sender-type-btn';
-                });
-                el.className = 'sender-type-btn ' + (type === 'username' ? 'active-username' : 'active-code');
-            }
-            notify('Sender type updated to: ' + (type === 'code' ? 'CODE' : 'USERNAME'));
-        });
-    }
-
     function addNewCoin() {
         const n = document.getElementById('new-c-name').value.trim();
         const tid = document.getElementById('new-c-tid').value.trim();
@@ -1284,16 +1392,17 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
         const ar = parseFloat(document.getElementById('new-c-admin').value || 0);
         const sl = normalizeSubmitLimit(document.getElementById('new-c-limit').value);
         const adminMinQty = normalizeAdminMinQty(document.getElementById('new-c-admin-min').value);
+        const senderInputType = normalizeSenderInputType(document.getElementById('new-c-sender-type').value);
+        
         if (!n || !tid || !ur || !ar) return notify('Fill all coin fields.');
-        db.ref('marketConfig/' + n).set({ transferId: tid, userRate: ur, adminRate: ar, submitLimit: sl, adminMinQty, status: true, senderType: newCoinSenderType }).then(() => {
+        db.ref('marketConfig/' + n).set({ transferId: tid, userRate: ur, adminRate: ar, submitLimit: sl, adminMinQty, senderInputType, status: true }).then(() => {
             document.getElementById('new-c-name').value = '';
             document.getElementById('new-c-tid').value = '';
             document.getElementById('new-c-user').value = '';
             document.getElementById('new-c-admin').value = '';
             document.getElementById('new-c-limit').value = '';
             document.getElementById('new-c-admin-min').value = '';
-            newCoinSenderType = 'username';
-            selectNewCoinSenderType('username');
+            document.getElementById('new-c-sender-type').value = 'username';
             notify('Coin added successfully!');
         });
     }
@@ -1472,7 +1581,3 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
 </script>
 </body>
 </html>
-
-
-
-
