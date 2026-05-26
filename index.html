@@ -343,6 +343,56 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
 .admin-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 .admin-small-note { font-size:12px; color:#94a3b8; line-height:1.5; }
 
+/* SENDER TYPE TOGGLE */
+.sender-type-toggle {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+.sender-type-btn {
+    flex: 1;
+    padding: 9px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    border: 1.5px solid #334155;
+    background: #0f172a;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    text-align: center;
+}
+.sender-type-btn.active-username {
+    background: #1d4ed820;
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+.sender-type-btn.active-code {
+    background: #7c3aed20;
+    border-color: #a78bfa;
+    color: #a78bfa;
+}
+.sender-label-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+.sender-label-username { background: #1d4ed820; color: #3b82f6; border: 1px solid #3b82f640; }
+.sender-label-code { background: #7c3aed20; color: #a78bfa; border: 1px solid #a78bfa40; }
+
+/* Improved form input focus */
+.form-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+.adm-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+
     </style>
 </head>
 <body>
@@ -466,6 +516,7 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
             <button onclick="copyAdminID()" style="background:white; border:1px solid #fcd34d; padding:5px 15px; border-radius:12px; font-size:11px; font-weight:800;">COPY ID</button>
         </div>
         <input type="number" id="input-qty" class="form-input" placeholder="Amount (Min 5000)" oninput="calculatePayout()">
+        <div id="sender-field-label" style="font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; margin-top:4px; padding-left:4px;">Sender Username <span class="sender-label-badge sender-label-username">USERNAME</span></div>
         <input type="text" id="input-sender" class="form-input" placeholder="SENDER USERNAME">
         <div style="display:grid; grid-template-columns:1fr 1.2fr; gap:12px;">
             <select id="input-method" class="form-input"></select>
@@ -498,7 +549,7 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
                 <b id="r-qty" style="color:#1e293b;">---</b>
             </div>
             <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                <span style="color: #64748b;">Sender:</span> 
+                <span style="color: #64748b;" id="r-sender-label">Sender:</span> 
                 <b id="r-sender" style="color:#1e293b;">---</b>
             </div>
             <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
@@ -641,7 +692,7 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
                 const submitLimit = normalizeSubmitLimit(v.submitLimit);
                 const adminMinQty = normalizeAdminMinQty(v.adminMinQty);
                 html += `<div class="coin-card ${on ? '' : 'offline'}"
-                    ${on ? `data-coin="${escapeHtml(c.key)}" data-user-rate="${Number(v.userRate || 0)}" data-admin-rate="${Number(v.adminRate || 0)}" data-transfer-id="${escapeHtml(v.transferId || '')}" data-submit-limit="${submitLimit}" data-admin-min="${adminMinQty}" onclick="handleCoinCardClick(this)"` : ''}>
+                    ${on ? `data-coin="${escapeHtml(c.key)}" data-user-rate="${Number(v.userRate || 0)}" data-admin-rate="${Number(v.adminRate || 0)}" data-transfer-id="${escapeHtml(v.transferId || '')}" data-submit-limit="${submitLimit}" data-admin-min="${adminMinQty}" data-sender-type="${escapeHtml(v.senderType || 'username')}" onclick="handleCoinCardClick(this)"` : ''}>
                     <div class="status-badge ${on ? 'status-online' : 'status-offline'}">${on ? '● Online' : '● Offline'}</div>
                     <div style="display:flex; align-items:center; gap:15px;">
                         <div class="icon-box">🪙</div>
@@ -684,11 +735,14 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
             parseFloat(card.dataset.adminRate || 0),
             card.dataset.transferId || '',
             normalizeSubmitLimit(card.dataset.submitLimit),
-            normalizeAdminMinQty(card.dataset.adminMin)
+            normalizeAdminMinQty(card.dataset.adminMin),
+            card.dataset.senderType || 'username'
         );
     }
 
-    function openOrderModal(name, userRate, adminRate, tid, submitLimit, adminMinQty) {
+    let currentCoinSenderType = 'username';
+
+    function openOrderModal(name, userRate, adminRate, tid, submitLimit, adminMinQty, senderType) {
         currentSelectedCoin = name;
         currentCoinRate = parseFloat(userRate || 0);
         currentCoinAdminRate = parseFloat(adminRate || 0);
@@ -697,6 +751,7 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
         currentCoinAdminMinQty = normalizeAdminMinQty(adminMinQty);
         currentAppliedRate = currentCoinRate;
         calculatedFinalPayout = 0;
+        currentCoinSenderType = senderType || 'username';
 
         document.getElementById('modal-coin-title').innerText = 'Sell ' + name;
         document.getElementById('display-admin-id').innerText = tid || '---';
@@ -705,6 +760,17 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
         document.getElementById('input-number').value = '';
         document.getElementById('input-qty').placeholder = `Amount (Min ${currentCoinSubmitLimit})`;
         document.getElementById('display-final-payout').innerText = '0.00 ৳';
+
+        // Update sender input based on senderType
+        const senderInput = document.getElementById('input-sender');
+        const senderLabel = document.getElementById('sender-field-label');
+        if (currentCoinSenderType === 'code') {
+            senderInput.placeholder = 'SENDER CODE';
+            if (senderLabel) senderLabel.innerHTML = 'Sender Code <span class="sender-label-badge sender-label-code">CODE</span>';
+        } else {
+            senderInput.placeholder = 'SENDER USERNAME';
+            if (senderLabel) senderLabel.innerHTML = 'Sender Username <span class="sender-label-badge sender-label-username">USERNAME</span>';
+        }
 
         const orderModal = document.getElementById('order-modal');
         orderModal.style.display = 'flex';
@@ -750,6 +816,10 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
         document.getElementById('r-number').innerText = num;
         document.getElementById('r-pay').innerText = calculatedFinalPayout + ' ৳';
 
+        // Update review label for sender
+        const rSenderLabel = document.getElementById('r-sender-label');
+        if (rSenderLabel) rSenderLabel.innerText = currentCoinSenderType === 'code' ? 'Sender Code:' : 'Sender Username:';
+
         closeModal();
         const rm = document.getElementById('review-modal');
         rm.style.display = 'flex';
@@ -785,6 +855,7 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
             amt: parseFloat(document.getElementById('r-qty').innerText) || 0,
             payable: parseFloat(calculatedFinalPayout) || 0,
             sender: document.getElementById('r-sender').innerText,
+            senderType: currentCoinSenderType || 'username',
             number: document.getElementById('r-number').innerText,
             method: document.getElementById('r-method').innerText,
             status: 'pending',
@@ -976,7 +1047,7 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
                     <div class="order-header" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
                         <div>
                             <b style="font-size:14px; color:#f1f5f9;">@${escapeHtml(getOrderOwnerLabel(o))}</b><br>
-                            <small style="color:#94a3b8; font-size:11px;">${escapeHtml(o.sender || '---')}</small>
+                            <small style="color:#94a3b8; font-size:11px;">${o.senderType === 'code' ? '🔑' : '👤'} ${escapeHtml(o.sender || '---')} <span style="font-size:9px; padding:1px 5px; border-radius:5px; ${o.senderType === 'code' ? 'background:#7c3aed20;color:#a78bfa;' : 'background:#1d4ed820;color:#3b82f6;'}">${o.senderType === 'code' ? 'CODE' : 'USERNAME'}</span></small>
                         </div>
                         <span class="status-badge" style="position:static; background:${statusColor}20; color:${statusColor}; font-size:10px; padding:4px 8px; border-radius:8px; font-weight:800;">${escapeHtml(status.toUpperCase())}</span>
                     </div>
@@ -1041,6 +1112,13 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
             <div class="admin-grid-2">
                 <input type="number" id="new-c-limit" class="adm-input" placeholder="Submit Limit">
                 <input type="number" id="new-c-admin-min" class="adm-input" placeholder="Admin Rate From Qty">
+            </div>
+            <div style="margin-bottom:10px;">
+                <small style="font-size:9px; color:#94a3b8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Sender Field Type</small>
+                <div class="sender-type-toggle" style="margin-top:6px;">
+                    <div id="new-c-sender-username" class="sender-type-btn active-username" onclick="selectNewCoinSenderType('username')">👤 Username</div>
+                    <div id="new-c-sender-code" class="sender-type-btn" onclick="selectNewCoinSenderType('code')">🔑 Code</div>
+                </div>
             </div>
             <button onclick="addNewCoin()" class="adm-btn" style="background:#10b981; color:white;">ADD COIN</button>
         </div>
@@ -1119,6 +1197,19 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
                         <input type="number" class="adm-input" value="${normalizeSubmitLimit(v.submitLimit)}" onchange="db.ref('marketConfig/${c.key}').update({submitLimit: normalizeSubmitLimit(this.value)})" placeholder="Submit Limit">
                         <input type="number" class="adm-input" value="${normalizeAdminMinQty(v.adminMinQty)}" onchange="db.ref('marketConfig/${c.key}').update({adminMinQty: normalizeAdminMinQty(this.value)})" placeholder="Admin Rate From Qty">
                     </div>
+                    <div style="margin-top:8px; margin-bottom:4px;">
+                        <small style="font-size:9px; color:#94a3b8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Sender Field Type</small>
+                        <div class="sender-type-toggle">
+                            <div class="sender-type-btn ${(v.senderType || 'username') === 'username' ? 'active-username' : ''}" 
+                                onclick="setSenderType('${String(c.key).replace(/'/g, "\\'")}', 'username', this)">
+                                👤 Username
+                            </div>
+                            <div class="sender-type-btn ${v.senderType === 'code' ? 'active-code' : ''}"
+                                onclick="setSenderType('${String(c.key).replace(/'/g, "\\'")}', 'code', this)">
+                                🔑 Code
+                            </div>
+                        </div>
+                    </div>
                     <button class="adm-btn" style="color:#f87171; background:none; font-size:11px; margin-top:5px; font-weight:bold; border:1px solid #7f1d1d;" onclick="removeCoin('${String(c.key).replace(/'/g, "\\'")}')">REMOVE COIN</button>
                 </div>`;
             });
@@ -1162,6 +1253,30 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
         });
     }
 
+    let newCoinSenderType = 'username';
+
+    function selectNewCoinSenderType(type) {
+        newCoinSenderType = type;
+        const btnUsername = document.getElementById('new-c-sender-username');
+        const btnCode = document.getElementById('new-c-sender-code');
+        if (btnUsername) { btnUsername.className = 'sender-type-btn' + (type === 'username' ? ' active-username' : ''); }
+        if (btnCode) { btnCode.className = 'sender-type-btn' + (type === 'code' ? ' active-code' : ''); }
+    }
+
+    function setSenderType(coinKey, type, el) {
+        db.ref('marketConfig/' + coinKey).update({ senderType: type }).then(() => {
+            // Update button styles in the parent toggle
+            const toggle = el.closest('.sender-type-toggle');
+            if (toggle) {
+                toggle.querySelectorAll('.sender-type-btn').forEach(btn => {
+                    btn.className = 'sender-type-btn';
+                });
+                el.className = 'sender-type-btn ' + (type === 'username' ? 'active-username' : 'active-code');
+            }
+            notify('Sender type updated to: ' + (type === 'code' ? 'CODE' : 'USERNAME'));
+        });
+    }
+
     function addNewCoin() {
         const n = document.getElementById('new-c-name').value.trim();
         const tid = document.getElementById('new-c-tid').value.trim();
@@ -1170,13 +1285,15 @@ body { background: var(--bg); margin: 0; padding: 15px; padding-bottom: 120px; c
         const sl = normalizeSubmitLimit(document.getElementById('new-c-limit').value);
         const adminMinQty = normalizeAdminMinQty(document.getElementById('new-c-admin-min').value);
         if (!n || !tid || !ur || !ar) return notify('Fill all coin fields.');
-        db.ref('marketConfig/' + n).set({ transferId: tid, userRate: ur, adminRate: ar, submitLimit: sl, adminMinQty, status: true }).then(() => {
+        db.ref('marketConfig/' + n).set({ transferId: tid, userRate: ur, adminRate: ar, submitLimit: sl, adminMinQty, status: true, senderType: newCoinSenderType }).then(() => {
             document.getElementById('new-c-name').value = '';
             document.getElementById('new-c-tid').value = '';
             document.getElementById('new-c-user').value = '';
             document.getElementById('new-c-admin').value = '';
             document.getElementById('new-c-limit').value = '';
             document.getElementById('new-c-admin-min').value = '';
+            newCoinSenderType = 'username';
+            selectNewCoinSenderType('username');
             notify('Coin added successfully!');
         });
     }
